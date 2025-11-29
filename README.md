@@ -1,4 +1,4 @@
-# AWS GenAI Spot (Terraform) 🧪
+# AWS GenAI Lab 🧪
 
 This repository contains **Infrastructure as Code (Terraform)** to spin up a powerful, self-hosted AI environment on AWS using **Spot Instances**. It is designed for personal R&D, allowing you to deploy open-source Large Language Models (LLMs) like Llama 3, Mistral, or even uncensored models like Dolphin for cents on the dollar.
 
