@@ -22,7 +22,7 @@ echo -e "${BLUE}╔════════════════════�
 echo -e "${BLUE}║      AWS GenAI Lab - Setup Progress Monitor 🚀             ║${NC}"
 echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}"
 echo -e "${YELLOW}Instance IP: ${IP}${NC}"
-echo -e "${CYAN}WebUI URL: http://${IP}:3000${NC}"
+echo -e "${CYAN}WebUI URL: http://${IP}:8080${NC}"
 echo ""
 
 # Fix permissions on the key
@@ -68,7 +68,7 @@ if check_ready && check_webui; then
     echo -e "${MAGENTA}║                    🎉 SETUP COMPLETE! 🎉                   ║${NC}"
     echo -e "${MAGENTA}╚════════════════════════════════════════════════════════════╝${NC}\n"
     echo -e "${CYAN}🌐 Open your browser to:${NC}"
-    echo -e "${GREEN}   http://${IP}:3000${NC}\n"
+    echo -e "${GREEN}   http://${IP}:8080${NC}\n"
     echo -e "${YELLOW}📝 Create an account and start chatting with your AI model!${NC}\n"
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
     echo -e "${CYAN}💻 Optional: Connect via SSH to use Ollama CLI${NC}"
@@ -114,7 +114,7 @@ ssh -i generated_key.pem -o StrictHostKeyChecking=no ubuntu@${IP} << 'ENDSSH'
         if systemctl is-active --quiet docker; then
             echo "   ✓ Docker: Running"
             if docker ps 2>/dev/null | grep -q open-webui; then
-                echo "   ✓ Open WebUI: Running on port 3000"
+                echo "   ✓ Open WebUI: Running on port 8080"
             else
                 echo "   ⏳ Open WebUI: Starting..."
             fi
@@ -168,7 +168,7 @@ echo -e "${MAGENTA}╔═══════════════════�
 echo -e "${MAGENTA}║                    🎉 ALL READY! 🎉                        ║${NC}"
 echo -e "${MAGENTA}╚════════════════════════════════════════════════════════════╝${NC}\n"
 echo -e "${CYAN}🌐 OPEN WEB INTERFACE (Recommended):${NC}"
-echo -e "${GREEN}   http://${IP_FOR_OUTPUT}:3000${NC}\n"
+echo -e "${GREEN}   http://${IP_FOR_OUTPUT}:8080${NC}\n"
 echo -e "${YELLOW}   1. Open the URL in your browser${NC}"
 echo -e "${YELLOW}   2. Create a local account${NC}"
 echo -e "${YELLOW}   3. Start chatting with your AI model!${NC}\n"

@@ -200,6 +200,16 @@ resource "aws_instance" "lab_instance" {
                 sleep 1
               done
               
+              # Wait for Ollama API to be responsive
+              echo "Waiting for Ollama API..."
+              for i in {1..60}; do
+                if curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
+                  echo "Ollama API is ready!"
+                  break
+                fi
+                sleep 2
+              done
+              
               # Pull the model and log progress
               echo "=== Starting model download: ${local.model_config[var.lab_mode]} ==="
               ollama pull ${local.model_config[var.lab_mode]} 2>&1 | tee /var/log/ollama-pull.log
@@ -214,15 +224,14 @@ resource "aws_instance" "lab_instance" {
               # Add ubuntu user to docker group
               usermod -aG docker ubuntu
               
-              # Run Open WebUI
+              # Run Open WebUI with host networking for reliable Ollama connection
               echo "=== Starting Open WebUI ==="
               docker run -d \
                 --name open-webui \
-                -p 3000:8080 \
-                --add-host=host.docker.internal:host-gateway \
+                --network host \
                 -v open-webui:/app/backend/data \
                 --restart always \
-                -e OLLAMA_BASE_URL=http://host.docker.internal:11434 \
+                -e OLLAMA_BASE_URL=http://localhost:11434 \
                 ghcr.io/open-webui/open-webui:main
               
               # Create a ready flag file

@@ -157,7 +157,7 @@ Once `connect.sh` shows "SETUP COMPLETE", open the Web Interface:
 
 1. Open the URL shown by `connect.sh` in your browser:
    ```
-   http://YOUR_INSTANCE_IP:3000
+   http://YOUR_INSTANCE_IP:8080
    ```
 
 2. Create a local account (stored only on your instance)

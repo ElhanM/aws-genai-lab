@@ -5,7 +5,7 @@ output "instance_ip" {
 
 output "webui_url" {
   description = "Open WebUI URL"
-  value       = "http://${aws_instance.lab_instance.public_ip}:3000"
+  value       = "http://${aws_instance.lab_instance.public_ip}:8080"
 }
 
 output "connection_instructions" {
@@ -38,7 +38,7 @@ Once complete (2-5 minutes), you'll get the WebUI URL!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🌐 WEB INTERFACE (After setup completes):
-   http://${aws_instance.lab_instance.public_ip}:3000
+   http://${aws_instance.lab_instance.public_ip}:8080
 
 💻 SSH ACCESS (Optional, for advanced users):
    The connect.sh script also provides SSH access after setup
