@@ -1,0 +1,28 @@
+# Local .terraform directories (Plugins and provider binaries)
+**/.terraform/*
+
+# .tfstate files (contain secrets and current infra state)
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+crash.*.log
+
+# .tfvars files are likely to contain sensitive data
+# such as password, private keys, and AWS keys.
+*.tfvars
+*.tfvars.json
+
+# Ignore override files as they are usually local configurations
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Ignore generated SSH key
+generated_key.pem
