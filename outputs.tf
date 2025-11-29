@@ -17,7 +17,6 @@ output "connection_instructions" {
 
 Instance IP: ${aws_instance.lab_instance.public_ip}
 Mode: ${var.lab_mode}
-Model: ${local.model_config[var.lab_mode]}
 
 ⚡ NEXT STEP: Monitor Setup Progress
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -29,16 +28,18 @@ Run this command to watch the installation progress:
 This script will show you:
   ✓ Instance boot status
   ✓ Ollama installation progress  
-  ✓ AI model download status
   ✓ Docker & WebUI startup
   ✓ Real-time logs
 
-Once complete (2-5 minutes), you'll get the WebUI URL!
+Once complete (2-3 minutes), you'll get the WebUI URL!
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🌐 WEB INTERFACE (After setup completes):
    http://${aws_instance.lab_instance.public_ip}:8080
+
+📦 PULL A MODEL: After opening WebUI, use the model selector
+   to pull a model like 'dolphin-mistral' or 'llama3'
 
 💻 SSH ACCESS (Optional, for advanced users):
    The connect.sh script also provides SSH access after setup

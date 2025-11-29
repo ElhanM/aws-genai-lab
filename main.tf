@@ -28,12 +28,6 @@ locals {
     cpu = "t3.xlarge"  # 4 vCPU, 16GB RAM (No special quota needed usually)
     gpu = "g5.xlarge"  # 4 vCPU, 24GB VRAM (The AI Beast)
   }
-  
-  # Model Selection
-  model_config = {
-    cpu = "phi3"       # Tiny Microsoft model (3.8B) - Runs fast on CPU for testing
-    gpu = "llama3"     # Full Meta Llama 3 (8B) - Needs GPU for speed
-  }
 }
 
 # --- 2. Networking & Security ---
@@ -172,7 +166,7 @@ resource "aws_instance" "lab_instance" {
     volume_type = "gp3"
   }
 
-  # Startup Script: Installs Ollama, configures service, and pre-pulls the model
+  # Startup Script: Installs Ollama and Open WebUI
   user_data = <<-EOF
               #!/bin/bash
               set -e
@@ -209,10 +203,6 @@ resource "aws_instance" "lab_instance" {
                 fi
                 sleep 2
               done
-              
-              # Pull the model and log progress
-              echo "=== Starting model download: ${local.model_config[var.lab_mode]} ==="
-              ollama pull ${local.model_config[var.lab_mode]} 2>&1 | tee /var/log/ollama-pull.log
               
               # Install Docker for Open WebUI
               echo "=== Installing Docker ==="

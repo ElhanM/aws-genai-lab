@@ -1,6 +1,6 @@
 # AWS GenAI Spot (Terraform) 🧪
 
-This repository contains **Infrastructure as Code (Terraform)** to spin up a powerful, self-hosted AI environment on AWS using **Spot Instances**. It is designed for personal R&D, allowing you to deploy open-source Large Language Models (LLMs) like Llama 3 or Mistral for cents on the dollar.
+This repository contains **Infrastructure as Code (Terraform)** to spin up a powerful, self-hosted AI environment on AWS using **Spot Instances**. It is designed for personal R&D, allowing you to deploy open-source Large Language Models (LLMs) like Llama 3, Mistral, or even uncensored models like Dolphin for cents on the dollar.
 
 It features a **Dual Mode** switch so you can test immediately with a CPU, or run full AI workloads with a GPU (available after AWS quota increase approval).
 
@@ -82,10 +82,37 @@ EOF
 
 ## 💻 Hardware Selection - Dual Mode
 
-| **Mode** | **Flag** | **Hardware** | **Requires Permission?** | **Cost (Spot)** | **Use Case** | **Auto-Installed Model** |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **CPU** | `cpu` | `t3.xlarge` (16GB RAM) | **No** (Usually) | ~$0.05/hr | Testing Terraform, proving concept. | `phi3` (Small, Fast) |
-| **GPU** | `gpu` | `g5.xlarge` (24GB VRAM) | **Yes** (Requires Quota) | ~$0.30/hr | Real AI inference, 30B+ models. | `llama3` (Powerful) |
+| **Mode** | **Flag** | **Hardware** | **Requires Permission?** | **Cost (Spot)** | **Use Case** |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **CPU** | `cpu` | `t3.xlarge` (16GB RAM) | **No** (Usually) | ~$0.05/hr | Testing Terraform, small models (≤7B) |
+| **GPU** | `gpu` | `g5.xlarge` (24GB VRAM) | **Yes** (Requires Quota) | ~$0.30/hr | Real AI inference, larger models (8B-30B+) |
+
+-----
+
+## 🤖 Recommended Models
+
+Once your lab is running, you'll need to pull a model through the Open WebUI interface. Here are some recommendations:
+
+| **Model Name** | **Size** | **Type** | **Best For** | **Hardware** | **Pull Command** |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `phi3` | 3.8B | Censored | Fast testing, general chat | CPU | `phi3` |
+| `mistral` | 7B | Censored | Excellent reasoning | CPU | `mistral` |
+| `dolphin-phi` | 2.7B | Uncensored | Quick testing, no filters | CPU | `dolphin-phi` |
+| `dolphin-mistral` | 7B | Uncensored | Great balance, no restrictions | CPU | `dolphin-mistral` |
+| `llama3` | 8B | Censored | General purpose, latest | GPU | `llama3` |
+| `codellama` | 13B | Censored | Code generation, debugging | GPU | `codellama:13b` |
+| `dolphin-llama3` | 8B | Uncensored | Latest Llama 3, no safety filters | GPU | `dolphin-llama3` |
+| `dolphin-mixtral` | 47B | Uncensored | Most capable uncensored | GPU | `dolphin-mixtral:8x7b` |
+
+### How to Install a Model
+
+1. Open the WebUI at `http://YOUR_IP:8080`
+2. Click the **model selector** dropdown (top of chat)
+3. Type the model name from the table above (e.g., `dolphin-mistral`)
+4. Click **Pull** and wait for download
+5. Select the model and start chatting!
+
+**💡 Browse More Models:** Visit [https://ollama.com/library](https://ollama.com/library) to explore hundreds of available models. Copy the model name and pull it directly in Open WebUI.
 
 -----
 
@@ -113,14 +140,14 @@ terraform init
 ### 2\. Launch (Select your Mode)
 
 **Option A: Test Immediately (CPU Mode)**
-Use this to prove your setup works while waiting for AWS Support. It will install the smaller `phi3` model.
+Use this to prove your setup works while waiting for AWS Support.
 
 ```bash
 terraform apply -var="lab_mode=cpu"
 ```
 
 **Option B: Power Mode (GPU Mode)**
-Use this once your Quota Increase is approved. It will install the powerful `llama3` model.
+Use this once your Quota Increase is approved.
 
 ```bash
 terraform apply -var="lab_mode=gpu"
@@ -141,11 +168,10 @@ Run this script to watch the installation progress in real-time:
 **What it shows:**
 - ✅ Instance boot status
 - ✅ Ollama service installation
-- ✅ AI model download progress (with download speed and completion %)
 - ✅ Docker & Open WebUI startup
 - ✅ Live installation logs
 
-**Timeline:** The script will monitor for 2-5 minutes until everything is ready, then display the WebUI URL.
+**Timeline:** The script will monitor for 2-3 minutes until everything is ready, then display the WebUI URL.
 
 **Note:** The script also offers optional SSH access for advanced users who want to explore the server internals, but this is not necessary for normal use.
 
@@ -162,7 +188,9 @@ Once `connect.sh` shows "SETUP COMPLETE", open the Web Interface:
 
 2. Create a local account (stored only on your instance)
 
-3. Start chatting with your AI model!
+3. **Pull a model** using the model selector (see [Recommended Models](#-recommended-models) above)
+
+4. Start chatting with your AI model!
 
 ### 5\. Tear Down (The "Stop Billing" Button)
 

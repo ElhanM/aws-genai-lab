@@ -47,7 +47,7 @@ check_webui() {
 }
 
 # Wait for SSH to be available
-echo -e "${YELLOW}⏳ Step 1/3: Waiting for instance to boot and SSH to be ready...${NC}"
+echo -e "${YELLOW}⏳ Step 1/2: Waiting for instance to boot and SSH to be ready...${NC}"
 COUNTER=0
 MAX_WAIT=60
 while ! check_ssh; do
@@ -69,7 +69,10 @@ if check_ready && check_webui; then
     echo -e "${MAGENTA}╚════════════════════════════════════════════════════════════╝${NC}\n"
     echo -e "${CYAN}🌐 Open your browser to:${NC}"
     echo -e "${GREEN}   http://${IP}:8080${NC}\n"
-    echo -e "${YELLOW}📝 Create an account and start chatting with your AI model!${NC}\n"
+    echo -e "${YELLOW}📝 Next steps:${NC}"
+    echo -e "${YELLOW}   1. Create an account in Open WebUI${NC}"
+    echo -e "${YELLOW}   2. Click the model selector and pull a model${NC}"
+    echo -e "${YELLOW}   3. Try: dolphin-mistral, llama3, or phi3${NC}\n"
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
     echo -e "${CYAN}💻 Optional: Connect via SSH to use Ollama CLI${NC}"
     read -p "Press Enter to connect via SSH (or Ctrl+C to exit): "
@@ -78,8 +81,8 @@ if check_ready && check_webui; then
 fi
 
 # Show setup progress
-echo -e "${YELLOW}⏳ Step 2/3: Installing Ollama and downloading AI model...${NC}"
-echo -e "${BLUE}This will take 2-5 minutes depending on model size and network speed.${NC}\n"
+echo -e "${YELLOW}⏳ Step 2/2: Installing Ollama and Open WebUI...${NC}"
+echo -e "${BLUE}This will take 2-3 minutes.${NC}\n"
 
 # Monitor progress with live updates
 ssh -i generated_key.pem -o StrictHostKeyChecking=no ubuntu@${IP} << 'ENDSSH'
@@ -97,15 +100,6 @@ ssh -i generated_key.pem -o StrictHostKeyChecking=no ubuntu@${IP} << 'ENDSSH'
             echo "   ✓ Ollama service: Running"
         else
             echo "   ⏳ Ollama service: Installing..."
-        fi
-        echo ""
-        
-        # Check model download
-        echo "🤖 AI Model Download Progress:"
-        if [ -f /var/log/ollama-pull.log ]; then
-            tail -15 /var/log/ollama-pull.log | grep -E "pulling|success|SHA256" || echo "   ⏳ Download in progress..."
-        else
-            echo "   ⏳ Waiting for download to start..."
         fi
         echo ""
         
@@ -153,9 +147,6 @@ ssh -i generated_key.pem -o StrictHostKeyChecking=no ubuntu@${IP} << 'ENDSSH'
     echo "║                  ✓✓✓ SETUP COMPLETE! ✓✓✓                 ║"
     echo "╚════════════════════════════════════════════════════════════╝"
     echo ""
-    echo "📊 Installed Models:"
-    ollama list
-    echo ""
     echo "🐳 Running Containers:"
     sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 ENDSSH
@@ -167,11 +158,12 @@ echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━
 echo -e "${MAGENTA}╔════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${MAGENTA}║                    🎉 ALL READY! 🎉                        ║${NC}"
 echo -e "${MAGENTA}╚════════════════════════════════════════════════════════════╝${NC}\n"
-echo -e "${CYAN}🌐 OPEN WEB INTERFACE (Recommended):${NC}"
+echo -e "${CYAN}🌐 OPEN WEB INTERFACE:${NC}"
 echo -e "${GREEN}   http://${IP_FOR_OUTPUT}:8080${NC}\n"
 echo -e "${YELLOW}   1. Open the URL in your browser${NC}"
 echo -e "${YELLOW}   2. Create a local account${NC}"
-echo -e "${YELLOW}   3. Start chatting with your AI model!${NC}\n"
+echo -e "${YELLOW}   3. Click model selector → Pull a model${NC}"
+echo -e "${YELLOW}   4. Try: dolphin-mistral, llama3, or phi3${NC}\n"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
 echo -e "${CYAN}💻 OPTIONAL: SSH Terminal Access${NC}"
 read -p "Press Enter to connect via SSH for CLI access (or Ctrl+C to exit): "
