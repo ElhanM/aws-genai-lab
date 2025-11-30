@@ -14,12 +14,6 @@ variable "lab_mode" {
   }
 }
 
-variable "spot_price_limit" {
-  description = "The max price you are willing to pay per hour"
-  type        = string
-  default     = "0.80"
-}
-
 variable "aws_access_key_id" {
   description = "AWS Access Key ID"
   type        = string

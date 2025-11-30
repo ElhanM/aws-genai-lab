@@ -153,14 +153,6 @@ resource "aws_instance" "lab_instance" {
   # Use existing subnet if available, otherwise use the one we created
   subnet_id = length(data.aws_subnets.default.ids) > 0 ? data.aws_subnets.default.ids[0] : aws_subnet.default_subnet[0].id
 
-  instance_market_options {
-    market_type = "spot"
-    spot_options {
-      max_price = var.spot_price_limit 
-      spot_instance_type = "one-time"
-    }
-  }
-
   root_block_device {
     volume_size = 60
     volume_type = "gp3"

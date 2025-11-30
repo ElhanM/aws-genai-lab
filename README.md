@@ -1,12 +1,12 @@
 # AWS GenAI Lab 🧪
 
-This repository contains **Infrastructure as Code (Terraform)** to spin up a powerful, self-hosted AI environment on AWS using **Spot Instances**. It is designed for personal R&D, allowing you to deploy open-source Large Language Models (LLMs) like Llama 3, Mistral, or even uncensored models like Dolphin for cents on the dollar.
+This repository contains **Infrastructure as Code (Terraform)** to spin up a powerful, self-hosted AI environment on AWS. It is designed for personal R&D, allowing you to deploy open-source Large Language Models (LLMs) like Llama 3, Mistral, or even uncensored models like Dolphin.
 
 It features a **Dual Mode** switch so you can test immediately with a CPU, or run full AI workloads with a GPU (available after AWS quota increase approval).
 
 ## 🎯 Project Goal
 
-To create a **"dispose-on-demand"** AI lab. We use Terraform to automate the creation and destruction of the infrastructure, ensuring we only pay for the exact minutes we are using the GPU.
+To create a **"dispose-on-demand"** AI lab. We use Terraform to automate the creation and destruction of the infrastructure, ensuring we only pay for the exact time we are using the resources.
 
 -----
 
@@ -82,10 +82,10 @@ EOF
 
 ## 💻 Hardware Selection - Dual Mode
 
-| **Mode** | **Flag** | **Hardware** | **Requires Permission?** | **Cost (Spot)** | **Use Case** |
+| **Mode** | **Flag** | **Hardware** | **Requires Permission?** | **Cost (On-Demand)** | **Use Case** |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **CPU** | `cpu` | `t3.xlarge` (16GB RAM) | **No** (Usually) | ~$0.05/hr | Testing Terraform, small models (≤7B) |
-| **GPU** | `gpu` | `g5.xlarge` (24GB VRAM) | **Yes** (Requires Quota) | ~$0.30/hr | Real AI inference, larger models (8B-30B+) |
+| **CPU** | `cpu` | `t3.xlarge` (16GB RAM) | **No** (Usually) | ~$0.17/hr | Testing Terraform, small models (≤7B) |
+| **GPU** | `gpu` | `g5.xlarge` (24GB VRAM) | **Yes** (Requires Quota) | ~$1.01/hr | Real AI inference, larger models (8B-30B+) |
 
 -----
 
@@ -93,37 +93,22 @@ EOF
 
 Once your lab is running, you'll need to pull a model through the Open WebUI interface. Here are some recommendations:
 
-| **Model Name** | **Size** | **Type** | **Best For** | **Hardware** | **Pull Command** |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `phi3` | 3.8B | Censored | Fast testing, general chat | CPU | `phi3` |
-| `mistral` | 7B | Censored | Excellent reasoning | CPU | `mistral` |
-| `dolphin-phi` | 2.7B | Uncensored | Quick testing, no filters | CPU | `dolphin-phi` |
-| `dolphin-mistral` | 7B | Uncensored | Great balance, no restrictions | CPU | `dolphin-mistral` |
-| `llama3` | 8B | Censored | General purpose, latest | GPU | `llama3` |
-| `codellama` | 13B | Censored | Code generation, debugging | GPU | `codellama:13b` |
-| `dolphin-llama3` | 8B | Uncensored | Latest Llama 3, no safety filters | GPU | `dolphin-llama3` |
-| `dolphin-mixtral` | 47B | Uncensored | Most capable uncensored | GPU | `dolphin-mixtral:8x7b` |
+| **Model Name** | **Size** | **Modality** | **Safety** | **Best For** | **Hardware** | **Pull Command** |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `tinyllama` | 1.1B | Text | **Censored** | Instant connection testing | CPU (t3.xlarge) | `tinyllama` |
+| `dolphin-llama3` | 8B | Text | **Uncensored** | General Assistant, Code, Logic | GPU (g5.xlarge) | `dolphin-llama3` |
+| `whiterabbitneo` | 13B | Text | **Uncensored** | Pentesting, Exploits, CTFs | GPU (g5.xlarge) | `WhiteRabbitNeo/WhiteRabbitNeo-V3-7B` |
+| `deepseek-coder-v2` | 16B | Code | **Low Filter** | Attack Scripts, Malware Analysis | GPU (g5.xlarge) | `deepseek-coder-v2` |
 
 ### How to Install a Model
 
 1. Open the WebUI at `http://YOUR_IP:8080`
 2. Click the **model selector** dropdown (top of chat)
-3. Type the model name from the table above (e.g., `dolphin-mistral`)
-4. Click **Pull** and wait for download
+3. Type the **Pull Command** from the table above (e.g., `whiterabbitneo`)
+4. Click **Pull** and wait for the download to finish
 5. Select the model and start chatting!
 
-**💡 Browse More Models:** Visit [https://ollama.com/library](https://ollama.com/library) to explore hundreds of available models. Copy the model name and pull it directly in Open WebUI.
-
------
-
-## 💰 Cost Strategy: Spot Instances
-
-We use **Spot Instances** in this Terraform configuration.
-
-  * **Concept:** We bid on unused AWS capacity.
-  * **Benefit:** \~60-90% discount vs On-Demand prices.
-  * **Risk:** AWS can terminate the instance if they need the capacity back (rare in N. Virginia for G5s, but possible).
-  * **Control:** The Terraform scripts use a disposable SSH key. If you destroy the infrastructure, you lose the data on the disk. This is by design to prevent accidental billing.
+**💡 Browse More Models:** Visit [https://ollama.com/library](https://ollama.com/library) to explore hundreds of available models.
 
 -----
 
