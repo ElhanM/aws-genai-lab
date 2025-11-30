@@ -89,26 +89,35 @@ EOF
 
 -----
 
-## 🤖 Recommended Models
+## 🤖 Finding and Installing Models
 
-Once your lab is running, you'll need to pull a model through the Open WebUI interface. Here are some recommendations:
+Once your lab is running, you can pull any model available through Ollama or Hugging Face.
 
-| **Model Name** | **Size** | **Modality** | **Safety** | **Best For** | **Hardware** | **Pull Command** |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `tinyllama` | 1.1B | Text | **Censored** | Instant connection testing | CPU (t3.xlarge) | `tinyllama` |
-| `dolphin-llama3` | 8B | Text | **Uncensored** | General Assistant, Code, Logic | GPU (g5.xlarge) | `dolphin-llama3` |
-| `whiterabbitneo` | 13B | Text | **Uncensored** | Pentesting, Exploits, CTFs | GPU (g5.xlarge) | `WhiteRabbitNeo/WhiteRabbitNeo-V3-7B` |
-| `deepseek-coder-v2` | 16B | Code | **Low Filter** | Attack Scripts, Malware Analysis | GPU (g5.xlarge) | `deepseek-coder-v2` |
+### Browse Available Models
+
+**Ollama Library:** [https://ollama.com/library](https://ollama.com/library)
+- Curated, pre-optimized models ready to use
+- Simple pull commands (e.g., `llama3`, `mistral`, `phi3`)
+
+**Hugging Face GGUF Models:** [https://huggingface.co/models?library=gguf](https://huggingface.co/models?library=gguf)
+- Thousands of community models in GGUF format
+- Use format: `hf.co/username/repository-name`
 
 ### How to Install a Model
 
 1. Open the WebUI at `http://YOUR_IP:8080`
 2. Click the **model selector** dropdown (top of chat)
-3. Type the **Pull Command** from the table above (e.g., `whiterabbitneo`)
-4. Click **Pull** and wait for the download to finish
-5. Select the model and start chatting!
+3. Click **"Pull a model from Ollama.com"**
+4. Enter one of:
+   - **Ollama model:** Just the name (e.g., `llama3`)
+   - **Hugging Face GGUF:** Full path (e.g., `hf.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF`)
+5. Click **Pull** and wait for the download
+6. Select the model and start chatting!
 
-**💡 Browse More Models:** Visit [https://ollama.com/library](https://ollama.com/library) to explore hundreds of available models.
+### Hardware Considerations
+
+- **CPU mode (`t3.xlarge`):** Best for smaller models (≤7B parameters)
+- **GPU mode (`g5.xlarge`):** Can handle larger models (8B-30B+ parameters)
 
 -----
 

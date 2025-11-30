@@ -38,8 +38,9 @@ Once complete (2-3 minutes), you'll get the WebUI URL!
 🌐 WEB INTERFACE (After setup completes):
    http://${aws_instance.lab_instance.public_ip}:8080
 
-📦 PULL A MODEL: After opening WebUI, use the model selector
-   to pull a model like 'dolphin-mistral' or 'llama3'
+📦 FIND MODELS:
+   • Ollama Library: ollama.com/library
+   • Hugging Face GGUF: huggingface.co/models?library=gguf
 
 💻 SSH ACCESS (Optional, for advanced users):
    The connect.sh script also provides SSH access after setup

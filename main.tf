@@ -91,6 +91,13 @@ resource "aws_security_group" "ai_lab_sg" {
     cidr_blocks = ["0.0.0.0/0"]
     description = "Open WebUI"
   }
+  ingress {
+    from_port   = 9099
+    to_port     = 9099
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Open WebUI Pipelines"
+  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -206,7 +213,16 @@ resource "aws_instance" "lab_instance" {
               # Add ubuntu user to docker group
               usermod -aG docker ubuntu
               
-              # Run Open WebUI with host networking for reliable Ollama connection
+              # Run Open WebUI Pipelines for HuggingFace support
+              echo "=== Starting Open WebUI Pipelines ==="
+              docker run -d \
+                --name pipelines \
+                --network host \
+                -v pipelines:/app/pipelines \
+                --restart always \
+                ghcr.io/open-webui/pipelines:main
+              
+              # Run Open WebUI with Pipelines integration
               echo "=== Starting Open WebUI ==="
               docker run -d \
                 --name open-webui \
@@ -214,6 +230,7 @@ resource "aws_instance" "lab_instance" {
                 -v open-webui:/app/backend/data \
                 --restart always \
                 -e OLLAMA_BASE_URL=http://localhost:11434 \
+                -e OPENAI_API_BASE_URLS=http://localhost:9099 \
                 ghcr.io/open-webui/open-webui:main
               
               # Create a ready flag file
