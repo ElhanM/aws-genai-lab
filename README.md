@@ -82,10 +82,10 @@ EOF
 
 ## 💻 Hardware Selection - Dual Mode
 
-| **Mode** | **Flag** | **Hardware** | **Requires Permission?** | **Cost (On-Demand)** | **Use Case** |
+| **Mode** | **Flag** | **Hardware** | **vCPUs (Quota Usage)** | **Cost (On-Demand)** | **Use Case** |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **CPU** | `cpu` | `t3.xlarge` (16GB RAM) | **No** (Usually) | ~$0.17/hr | Testing Terraform, small models (≤7B) |
-| **GPU** | `gpu` | `g5.xlarge` (24GB VRAM) | **Yes** (Requires Quota) | ~$1.01/hr | Real AI inference, larger models (8B-30B+) |
+| **CPU** | `cpu` | `t3.xlarge` (16GB RAM) | 4 | ~$0.17/hr | Testing Terraform, small models (≤7B) |
+| **GPU** | `gpu` | `g5.xlarge` (24GB VRAM) | 4 | ~$1.01/hr | Real AI inference, larger models (8B-30B+) |
 
 -----
 
