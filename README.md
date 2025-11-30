@@ -101,7 +101,8 @@ Once your lab is running, you can pull any model available through Ollama or Hug
 
 **Hugging Face GGUF Models:** [https://huggingface.co/models?library=gguf](https://huggingface.co/models?library=gguf)
 - Thousands of community models in GGUF format
-- Use format: `hf.co/username/repository-name`
+- Click **"Use this model"** → **"Ollama"** to get the command
+- Copy only the part after `ollama run` (e.g., `hf.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M`)
 
 ### How to Install a Model
 
@@ -110,7 +111,7 @@ Once your lab is running, you can pull any model available through Ollama or Hug
 3. Click **"Pull a model from Ollama.com"**
 4. Enter one of:
    - **Ollama model:** Just the name (e.g., `llama3`)
-   - **Hugging Face GGUF:** Full path (e.g., `hf.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF`)
+   - **Hugging Face GGUF:** The path without `ollama run` (e.g., `hf.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M`)
 5. Click **Pull** and wait for the download
 6. Select the model and start chatting!
 
