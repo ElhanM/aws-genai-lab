@@ -14,6 +14,16 @@ variable "lab_mode" {
   }
 }
 
+variable "gpu_size" {
+  description = "GPU instance size: 'small' (4 vCPUs), 'medium' (8 vCPUs), 'large' (16 vCPUs), or 'xlarge' (32 vCPUs)"
+  type        = string
+  default     = "small"
+  validation {
+    condition     = contains(["small", "medium", "large", "xlarge"], var.gpu_size)
+    error_message = "The gpu_size must be 'small', 'medium', 'large', or 'xlarge'."
+  }
+}
+
 variable "aws_access_key_id" {
   description = "AWS Access Key ID"
   type        = string

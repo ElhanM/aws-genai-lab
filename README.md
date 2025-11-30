@@ -18,19 +18,19 @@ To create a **"dispose-on-demand"** AI lab. We use Terraform to automate the cre
 
 1. Log into your AWS Console
 2. Search for **IAM** (Identity and Access Management) in the top search bar
-3. Click **Users** in the left sidebar → **Create user**
+3. Click **Users** in the left sidebar -> **Create user**
 4. Set username: `terraform-deployer` (or any name you prefer)
 5. Click **Next**
 6. Select **Attach policies directly**
 7. Search and check: **AdministratorAccess**
    - *For production, you'd want to restrict permissions further, but for a personal lab this is simplest*
-8. Click **Next** → **Create user**
+8. Click **Next** -> **Create user**
 
 ### 1.2 Create Access Keys for the IAM User
 
 1. Click on your newly created user (`terraform-deployer`)
 2. Go to the **Security credentials** tab
-3. Scroll down to **Access keys** → Click **Create access key**
+3. Scroll down to **Access keys** -> Click **Create access key**
 4. Select **Command Line Interface (CLI)** as the use case
 5. Check the confirmation box: "I understand the above recommendation..."
 6. Click **Next**
@@ -67,25 +67,45 @@ EOF
 
 **You can skip this step if you only want to test CPU mode first.**
 
+#### How to Request GPU Quota
+
 1. Log into your AWS Console
 2. Select AWS Region: **US East (N. Virginia)** (or Ohio)
 3. Search for **"Service Quotas"** in the top search bar
-4. Click **AWS Services** in the sidebar → type **"Amazon Elastic Compute Cloud (Amazon EC2)"**
+4. Click **AWS Services** in the sidebar -> type **"Amazon Elastic Compute Cloud (Amazon EC2)"**
 5. In the search bar specifically for EC2, type **"Running On-Demand G and VT instances"**
 6. Click **Request increase at account level**
-7. Set new value: **8** (Enough for one `g5.xlarge`)
+7. Choose a quota value based on which GPU size you want (see table below)
 8. Wait for approval email (usually 1-24 hours) before proceeding
 9. If prompted for justification, use something like:
-   > "Requesting quota increase for personal professional development. My goal is to gain hands-on DevOps experience by deploying self-hosted open-source LLMs using Terraform for Infrastructure as Code. I intend to benchmark performance and compare the reasoning capabilities of different model architectures. This is strictly for personal education and research; no production or business traffic."
+   > "I am requesting a quota increase to run self-hosted LLMs for personal research. I plan to spin up these instances on-demand to interact with open-source models from Hugging Face. Self-hosting on AWS also ensures I can use AI without third-party providers collecting my data. I am using Terraform to manage these resources efficiently. This is strictly for personal education and testing; there is no production or business traffic"
 
 -----
 
-## 💻 Hardware Selection - Dual Mode
+## 💻 Hardware Selection
 
-| **Mode** | **Flag** | **Hardware** | **vCPUs (Quota Usage)** | **Cost (On-Demand)** | **Use Case** |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **CPU** | `cpu` | `t3.xlarge` (16GB RAM) | 4 | ~$0.17/hr | Testing Terraform, small models (≤7B) |
-| **GPU** | `gpu` | `g5.xlarge` (24GB VRAM) | 4 | ~$1.01/hr | Real AI inference, larger models (8B-30B+) |
+### CPU Mode (No Quota Needed)
+
+| Instance | vCPUs | RAM | Cost/Hour | Use Case |
+|----------|-------|-----|-----------|----------|
+| `t3.xlarge` | 4 | 16GB | ~$0.17 | Testing Terraform, small models (≤7B) |
+
+**To use:** Just run with `lab_mode=cpu` (default)
+
+### GPU Mode (Requires Quota Approval)
+
+All g5 instances below have the **same GPU** (1x NVIDIA A10G with 24GB VRAM). The difference is in **CPU cores and system RAM**, which affects how fast you can process prompts and handle larger context windows.
+
+| Size Flag | Instance Type | vCPUs (Quota) | System RAM | GPU | GPU VRAM | Cost/Hour | Model Capacity (Params) | Best For |
+|-----------|---------------|---------------|------------|-----|----------|-----------|------------------------|----------|
+| `small` | `g5.xlarge` | 4 | 16GB | 1x A10G | 24GB | ~$1.01 | 7B-13B (Q4/Q5) | Testing GPU, basic inference |
+| `medium` | `g5.2xlarge` | 8 | 32GB | 1x A10G | 24GB | ~$1.21 | 7B-13B (Q6/Q8), 20B (Q4) | Faster inference, better multitasking |
+| `large` | `g5.4xlarge` | 16 | 64GB | 1x A10G | 24GB | ~$1.62 | 13B-20B (Q5/Q6), 30B (Q4) | Large context windows, complex prompts |
+| `xlarge` | `g5.8xlarge` | 32 | 128GB | 1x A10G | 24GB | ~$2.45 | 20B-30B (Q5/Q6), 34B (Q4) | Maximum performance for single GPU |
+
+**To use:** Run with `lab_mode=gpu` and specify the size with `gpu_size=small|medium|large|xlarge`
+
+**Note:** Model capacity is primarily limited by GPU VRAM (24GB on all instances). Larger system RAM allows for better handling of context windows, simultaneous model loading, and preprocessing. Models are available in **GGUF format**, supporting various **quantization levels**: Q4 (smallest/fastest), Q5 (balanced), Q6/Q8 (highest quality).
 
 -----
 
@@ -101,7 +121,7 @@ Once your lab is running, you can pull any model available through Ollama or Hug
 
 **Hugging Face GGUF Models:** [https://huggingface.co/models?library=gguf](https://huggingface.co/models?library=gguf)
 - Thousands of community models in GGUF format
-- Click **"Use this model"** → **"Ollama"** to get the command
+- Click **"Use this model"** -> **"Ollama"** to get the command
 - Copy only the part after `ollama run` (e.g., `hf.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M`)
 
 ### How to Install a Model
@@ -115,11 +135,6 @@ Once your lab is running, you can pull any model available through Ollama or Hug
 5. Click **Pull** and wait for the download
 6. Select the model and start chatting!
 
-### Hardware Considerations
-
-- **CPU mode (`t3.xlarge`):** Best for smaller models (≤7B parameters)
-- **GPU mode (`g5.xlarge`):** Can handle larger models (8B-30B+ parameters)
-
 -----
 
 ## 🚀 Usage
@@ -132,20 +147,35 @@ Initialize the Terraform working directory.
 terraform init
 ```
 
-### 2\. Launch (Select your Mode)
+### 2\. Launch (Select your Mode and Size)
 
-**Option A: Test Immediately (CPU Mode)**
+#### Option A: Test Immediately (CPU Mode)
 Use this to prove your setup works while waiting for AWS Support.
 
 ```bash
 terraform apply -var="lab_mode=cpu"
 ```
 
-**Option B: Power Mode (GPU Mode)**
-Use this once your Quota Increase is approved.
+#### Option B: Power Mode (GPU) - Choose Your Size
 
+**Small GPU (Quota: 4 vCPUs)** - Default, best for testing
 ```bash
-terraform apply -var="lab_mode=gpu"
+terraform apply -var="lab_mode=gpu" -var="gpu_size=small"
+```
+
+**Medium GPU (Quota: 8 vCPUs)** - More power for larger models
+```bash
+terraform apply -var="lab_mode=gpu" -var="gpu_size=medium"
+```
+
+**Large GPU (Quota: 16 vCPUs)** - For serious AI workloads
+```bash
+terraform apply -var="lab_mode=gpu" -var="gpu_size=large"
+```
+
+**XLarge GPU (Quota: 32 vCPUs)** - Maximum power
+```bash
+terraform apply -var="lab_mode=gpu" -var="gpu_size=xlarge"
 ```
 
 *Type `yes` when prompted.*
@@ -183,7 +213,7 @@ Once `connect.sh` shows "SETUP COMPLETE", open the Web Interface:
 
 2. Create a local account (stored only on your instance)
 
-3. **Pull a model** using the model selector (see [Recommended Models](#-recommended-models) above)
+3. **Pull a model** using the model selector (see [Finding and Installing Models](#-finding-and-installing-models) above)
 
 4. Start chatting with your AI model!
 
@@ -191,10 +221,15 @@ Once `connect.sh` shows "SETUP COMPLETE", open the Web Interface:
 
 **Crucial:** When you are done, run this immediately.
 
+**For CPU mode:**
 ```bash
 terraform destroy -var="lab_mode=cpu"
-# Or if you used GPU mode:
-terraform destroy -var="lab_mode=gpu"
+```
+
+**For GPU mode (specify the size you used):**
+```bash
+terraform destroy -var="lab_mode=gpu" -var="gpu_size=small"
+# Or whatever size you launched: medium, large, xlarge
 ```
 
 *This deletes everything. No hidden costs linger.*

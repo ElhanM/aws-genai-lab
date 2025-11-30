@@ -23,11 +23,19 @@ provider "aws" {
 
 # --- 1. Dynamic Hardware Selection ---
 locals {
-  # Hardware Profiles
-  instance_config = {
-    cpu = "t3.xlarge"  # 4 vCPU, 16GB RAM (No special quota needed usually)
-    gpu = "g5.xlarge"  # 4 vCPU, 24GB VRAM (The AI Beast)
+  # CPU Instance (Always the same)
+  cpu_instance = "t3.xlarge"  # 4 vCPU, 16GB RAM
+  
+  # GPU Instance Sizes (Quota-based selection)
+  gpu_instances = {
+    small  = "g5.xlarge"   # 4 vCPUs,  1 GPU, 24GB VRAM  - Quota: 4
+    medium = "g5.2xlarge"  # 8 vCPUs,  1 GPU, 24GB VRAM  - Quota: 8
+    large  = "g5.4xlarge"  # 16 vCPUs, 1 GPU, 24GB VRAM  - Quota: 16
+    xlarge = "g5.8xlarge"  # 32 vCPUs, 1 GPU, 24GB VRAM  - Quota: 32
   }
+  
+  # Final instance selection
+  selected_instance = var.lab_mode == "cpu" ? local.cpu_instance : local.gpu_instances[var.gpu_size]
 }
 
 # --- 2. Networking & Security ---
@@ -151,8 +159,8 @@ resource "aws_instance" "lab_instance" {
   # Select the right AMI based on the mode
   ami = var.lab_mode == "gpu" ? data.aws_ami.deep_learning_ami[0].id : data.aws_ami.ubuntu_ami[0].id
   
-  # Select the right Instance Type based on the mode
-  instance_type = local.instance_config[var.lab_mode]
+  # Select the right Instance Type based on mode and size
+  instance_type = local.selected_instance
   
   key_name      = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = [aws_security_group.ai_lab_sg.id]
@@ -240,6 +248,6 @@ resource "aws_instance" "lab_instance" {
               EOF
 
   tags = {
-    Name = "AWS-GenAI-Lab-${var.lab_mode}"
+    Name = "AWS-GenAI-Lab-${var.lab_mode}${var.lab_mode == "gpu" ? "-${var.gpu_size}" : ""}"
   }
 }
