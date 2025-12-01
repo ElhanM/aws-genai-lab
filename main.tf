@@ -26,12 +26,12 @@ locals {
   # CPU Instance (Always the same)
   cpu_instance = "t3.xlarge"  # 4 vCPU, 16GB RAM
   
-  # GPU Instance Sizes (Quota-based selection)
+  # GPU Instance Sizes (Focused on GPU count for model capacity)
   gpu_instances = {
-    small  = "g5.xlarge"   # 4 vCPUs,  1 GPU, 24GB VRAM  - Quota: 4
-    medium = "g5.2xlarge"  # 8 vCPUs,  1 GPU, 24GB VRAM  - Quota: 8
-    large  = "g5.4xlarge"  # 16 vCPUs, 1 GPU, 24GB VRAM  - Quota: 16
-    xlarge = "g5.8xlarge"  # 32 vCPUs, 1 GPU, 24GB VRAM  - Quota: 32
+    small  = "g5.xlarge"    # 1 GPU  (24GB VRAM)   - Quota: 4 vCPUs
+    medium = "g5.12xlarge"  # 4 GPUs (96GB VRAM)   - Quota: 48 vCPUs
+    large  = "g5.24xlarge"  # 4 GPUs (96GB VRAM)   - Quota: 96 vCPUs
+    xlarge = "g5.48xlarge"  # 8 GPUs (192GB VRAM)  - Quota: 192 vCPUs
   }
   
   # Final instance selection

@@ -15,7 +15,7 @@ variable "lab_mode" {
 }
 
 variable "gpu_size" {
-  description = "GPU instance size: 'small' (4 vCPUs), 'medium' (8 vCPUs), 'large' (16 vCPUs), or 'xlarge' (32 vCPUs)"
+  description = "GPU instance size: 'small' (1 GPU, 24GB), 'medium' (4 GPUs, 96GB), 'large' (4 GPUs, 96GB), 'xlarge' (8 GPUs, 192GB)"
   type        = string
   default     = "small"
   validation {

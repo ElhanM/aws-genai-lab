@@ -72,13 +72,19 @@ EOF
 1. Log into your AWS Console
 2. Select AWS Region: **US East (N. Virginia)** (or Ohio)
 3. Search for **"Service Quotas"** in the top search bar
-4. Click **AWS Services** in the sidebar -> type **"Amazon Elastic Compute Cloud (Amazon EC2)"**
+4. Click **AWS Services** in the sidebar → type **"Amazon Elastic Compute Cloud (Amazon EC2)"**
 5. In the search bar specifically for EC2, type **"Running On-Demand G and VT instances"**
 6. Click **Request increase at account level**
-7. Choose a quota value based on which GPU size you want (see table below)
-8. Wait for approval email (usually 1-24 hours) before proceeding
+7. **Choose a quota value based on which GPU size you want:**
+   - **Small (1 GPU):** Request at least **4 vCPUs**
+   - **Medium (4 GPUs, 48 vCPUs):** Request at least **48 vCPUs**
+   - **Large (4 GPUs, 96 vCPUs, faster inference):** Request at least **96 vCPUs**
+   - **XLarge (8 GPUs):** Request at least **192 vCPUs**
+8. Wait for approval email (usually 1-24 hours for small, up to 2-3 days for larger quotas)
 9. If prompted for justification, use something like:
-   > "I am requesting a quota increase to run self-hosted LLMs for personal research. I plan to spin up these instances on-demand to interact with open-source models from Hugging Face. Self-hosting on AWS also ensures I can use AI without third-party providers collecting my data. I am using Terraform to manage these resources efficiently. This is strictly for personal education and testing; there is no production or business traffic"
+   > "I am requesting a quota increase to run self-hosted LLMs for personal research. I plan to spin up these instances on-demand to interact with open-source models from Hugging Face. The larger GPU configurations allow me to experiment with models ranging from 7B to 120B+ parameters. Self-hosting on AWS ensures I can use AI without third-party providers collecting my data. I am using Terraform to manage these resources efficiently and will destroy them when not in use. This is strictly for personal education and testing; there is no production or business traffic."
+
+**Pro Tip:** Start with `small` (4 vCPU quota) to test your setup while waiting for approval of larger quotas.
 
 -----
 
@@ -94,18 +100,25 @@ EOF
 
 ### GPU Mode (Requires Quota Approval)
 
-All g5 instances below have the **same GPU** (1x NVIDIA A10G with 24GB VRAM). The difference is in **CPU cores and system RAM**, which affects how fast you can process prompts and handle larger context windows.
+**The key to running bigger models is MORE GPUs, not more CPUs.** Each GPU adds 24GB of VRAM.
 
-| Size Flag | Instance Type | vCPUs (Quota) | System RAM | GPU | GPU VRAM | Cost/Hour | Model Capacity (Params) | Best For |
-|-----------|---------------|---------------|------------|-----|----------|-----------|------------------------|----------|
-| `small` | `g5.xlarge` | 4 | 16GB | 1x A10G | 24GB | ~$1.01 | 7B-13B (Q4/Q5) | Testing GPU, basic inference |
-| `medium` | `g5.2xlarge` | 8 | 32GB | 1x A10G | 24GB | ~$1.21 | 7B-13B (Q6/Q8), 20B (Q4) | Faster inference, better multitasking |
-| `large` | `g5.4xlarge` | 16 | 64GB | 1x A10G | 24GB | ~$1.62 | 13B-20B (Q5/Q6), 30B (Q4) | Large context windows, complex prompts |
-| `xlarge` | `g5.8xlarge` | 32 | 128GB | 1x A10G | 24GB | ~$2.45 | 20B-30B (Q5/Q6), 34B (Q4) | Maximum performance for single GPU |
+| Size Flag | Instance | GPUs | CPU/RAM | vCPU Quota | Cost/Hour | Best Use Case |
+|-----------|----------|------|---------|------------|-----------|---------------|
+| `small` | `g5.xlarge` | 1 | 4/16GB | 4 | ~$1.01 | **7B-13B Q8** (highest quality, small models) |
+| `medium` | `g5.12xlarge` | 4 | 48/192GB | 48 | ~$5.67 | **30B-34B Q8** (highest quality, mid-size models) |
+| `large` | `g5.24xlarge` | 4 | 96/384GB | 96 | ~$8.14 | **70B Q8** (highest quality, large models) |
+| `xlarge` | `g5.48xlarge` | 8 | 192/768GB | 192 | ~$16.29 | **120B Q8** (highest quality, massive models) |
 
 **To use:** Run with `lab_mode=gpu` and specify the size with `gpu_size=small|medium|large|xlarge`
 
-**Note:** Model capacity is primarily limited by GPU VRAM (24GB on all instances). Larger system RAM allows for better handling of context windows, simultaneous model loading, and preprocessing. Models are available in **GGUF format**, supporting various **quantization levels**: Q4 (smallest/fastest), Q5 (balanced), Q6/Q8 (highest quality).
+**Understanding Quantization (Quality Levels):**
+- **Q8** = Highest quality, nearly identical to original model (uses most VRAM)
+- **Q5** = Balanced, slight quality loss, fits bigger models (recommended)
+- **Q4** = Smallest files, noticeably lower quality, fits massive models (not recommended unless you need 120B+)
+
+**Note:** 
+- `medium` vs `large`: Same GPU/VRAM, but `large` has 2x CPU/RAM for faster inference and bigger context windows
+- Costs shown are approximate US East (N. Virginia) on-demand rates
 
 -----
 
@@ -158,22 +171,22 @@ terraform apply -var="lab_mode=cpu"
 
 #### Option B: Power Mode (GPU) - Choose Your Size
 
-**Small GPU (Quota: 4 vCPUs)** - Default, best for testing
+**Small GPU (1 GPU, 24GB VRAM)** - For 7B-13B models
 ```bash
 terraform apply -var="lab_mode=gpu" -var="gpu_size=small"
 ```
 
-**Medium GPU (Quota: 8 vCPUs)** - More power for larger models
+**Medium GPU (4 GPUs, 96GB VRAM)** - For 30B-70B models
 ```bash
 terraform apply -var="lab_mode=gpu" -var="gpu_size=medium"
 ```
 
-**Large GPU (Quota: 16 vCPUs)** - For serious AI workloads
+**Large GPU (4 GPUs, 96GB VRAM)** - For 70B-120B models with faster inference
 ```bash
 terraform apply -var="lab_mode=gpu" -var="gpu_size=large"
 ```
 
-**XLarge GPU (Quota: 32 vCPUs)** - Maximum power
+**XLarge GPU (8 GPUs, 192GB VRAM)** - For 120B+ models
 ```bash
 terraform apply -var="lab_mode=gpu" -var="gpu_size=xlarge"
 ```
