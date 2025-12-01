@@ -71,7 +71,7 @@ resource "aws_subnet" "default_subnet" {
 
 resource "aws_security_group" "ai_lab_sg" {
   name        = "ai-lab-security-group"
-  description = "Allow SSH and AI UI ports"
+  description = "Allow SSH only - HTTP access via SSH tunnel"
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
@@ -79,32 +79,7 @@ resource "aws_security_group" "ai_lab_sg" {
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 11434
-    to_port     = 11434
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Open WebUI"
-  }
-  ingress {
-    from_port   = 9099
-    to_port     = 9099
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Open WebUI Pipelines"
+    description = "SSH access"
   }
   egress {
     from_port   = 0
@@ -230,7 +205,7 @@ resource "aws_instance" "lab_instance" {
                 --restart always \
                 ghcr.io/open-webui/pipelines:main
               
-              # Run Open WebUI with Pipelines integration
+              # Run Open WebUI with Pipelines integration and no authentication
               echo "=== Starting Open WebUI ==="
               docker run -d \
                 --name open-webui \
@@ -239,6 +214,7 @@ resource "aws_instance" "lab_instance" {
                 --restart always \
                 -e OLLAMA_BASE_URL=http://localhost:11434 \
                 -e OPENAI_API_BASE_URLS=http://localhost:9099 \
+                -e WEBUI_AUTH=False \
                 ghcr.io/open-webui/open-webui:main
               
               # Create a ready flag file

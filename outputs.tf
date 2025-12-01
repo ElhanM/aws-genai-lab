@@ -3,9 +3,9 @@ output "instance_ip" {
   value       = aws_instance.lab_instance.public_ip
 }
 
-output "webui_url" {
-  description = "Open WebUI URL"
-  value       = "http://${aws_instance.lab_instance.public_ip}:8080"
+output "ssh_tunnel_command" {
+  description = "SSH tunnel command for secure access"
+  value       = "ssh -i generated_key.pem -L 8080:localhost:8080 -L 11434:localhost:11434 ubuntu@${aws_instance.lab_instance.public_ip}"
 }
 
 output "connection_instructions" {
@@ -18,32 +18,35 @@ output "connection_instructions" {
 Instance IP: ${aws_instance.lab_instance.public_ip}
 Mode: ${var.lab_mode}
 
-⚡ NEXT STEP: Monitor Setup Progress
+⚡ NEXT STEP: Start SSH Tunnel & Monitor Setup
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Run this command to watch the installation progress:
+Run this command to establish a secure connection:
 
     ./connect.sh
 
-This script will show you:
-  ✓ Instance boot status
-  ✓ Ollama installation progress  
-  ✓ Docker & WebUI startup
-  ✓ Real-time logs
+This script will:
+  ✓ Create an SSH tunnel to your instance
+  ✓ Monitor installation progress  
+  ✓ Forward ports securely to localhost
+  ✓ Show real-time setup logs
 
-Once complete (2-3 minutes), you'll get the WebUI URL!
+Once complete (2-3 minutes), access the WebUI at:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🌐 WEB INTERFACE (After setup completes):
-   http://${aws_instance.lab_instance.public_ip}:8080
+🔒 SECURE WEB INTERFACE (via SSH tunnel):
+   http://localhost:8080
+
+🔐 SECURITY NOTES:
+   • WebUI is NOT exposed to the internet
+   • Only accessible through SSH tunnel
+   • No authentication required (single-user mode)
+   • Keep the connect.sh terminal open while using
 
 📦 FIND MODELS:
    • Ollama Library: ollama.com/library
    • Hugging Face GGUF: huggingface.co/models?library=gguf
-
-💻 SSH ACCESS (Optional, for advanced users):
-   The connect.sh script also provides SSH access after setup
 
 EOT
 }

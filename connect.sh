@@ -22,7 +22,7 @@ echo -e "${BLUE}╔════════════════════�
 echo -e "${BLUE}║      AWS GenAI Lab - Setup Progress Monitor 🚀             ║${NC}"
 echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}"
 echo -e "${YELLOW}Instance IP: ${IP}${NC}"
-echo -e "${CYAN}WebUI URL: http://${IP}:8080${NC}"
+echo -e "${CYAN}WebUI URL (via tunnel): http://localhost:8080${NC}"
 echo ""
 
 # Fix permissions on the key
@@ -67,16 +67,21 @@ if check_ready && check_webui; then
     echo -e "${MAGENTA}╔════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${MAGENTA}║                    🎉 SETUP COMPLETE! 🎉                   ║${NC}"
     echo -e "${MAGENTA}╚════════════════════════════════════════════════════════════╝${NC}\n"
-    echo -e "${CYAN}🌐 Open your browser to:${NC}"
-    echo -e "${GREEN}   http://${IP}:8080${NC}\n"
+    echo -e "${CYAN}🔒 Starting SSH tunnel to access WebUI securely...${NC}\n"
+    echo -e "${GREEN}   Open your browser to: http://localhost:8080${NC}\n"
     echo -e "${YELLOW}📝 Next steps:${NC}"
-    echo -e "${YELLOW}   1. Create an account in Open WebUI${NC}"
+    echo -e "${YELLOW}   1. Open http://localhost:8080 in your browser${NC}"
     echo -e "${YELLOW}   2. Click the model selector -> Pull a model${NC}"
     echo -e "${YELLOW}   3. Browse models at ollama.com/library or huggingface.co${NC}\n"
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
-    echo -e "${CYAN}💻 Optional: Connect via SSH to use Ollama CLI${NC}"
-    read -p "Press Enter to connect via SSH (or Ctrl+C to exit): "
-    ssh -i generated_key.pem ubuntu@${IP}
+    echo -e "${CYAN}🔐 SSH Tunnel Active - Press Ctrl+C to disconnect${NC}\n"
+    
+    # Start SSH tunnel with port forwarding
+    ssh -i generated_key.pem -o StrictHostKeyChecking=no \
+        -L 8080:localhost:8080 \
+        -L 11434:localhost:11434 \
+        -L 9099:localhost:9099 \
+        ubuntu@${IP}
     exit 0
 fi
 
@@ -108,7 +113,7 @@ ssh -i generated_key.pem -o StrictHostKeyChecking=no ubuntu@${IP} << 'ENDSSH'
         if systemctl is-active --quiet docker; then
             echo "   ✓ Docker: Running"
             if docker ps 2>/dev/null | grep -q open-webui; then
-                echo "   ✓ Open WebUI: Running on port 8080"
+                echo "   ✓ Open WebUI: Running on localhost:8080"
             else
                 echo "   ⏳ Open WebUI: Starting..."
             fi
@@ -151,22 +156,23 @@ ssh -i generated_key.pem -o StrictHostKeyChecking=no ubuntu@${IP} << 'ENDSSH'
     sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 ENDSSH
 
-IP_FOR_OUTPUT=$IP
-
 echo ""
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${MAGENTA}╔════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${MAGENTA}║                    🎉 ALL READY! 🎉                        ║${NC}"
 echo -e "${MAGENTA}╚════════════════════════════════════════════════════════════╝${NC}\n"
-echo -e "${CYAN}🌐 OPEN WEB INTERFACE:${NC}"
-echo -e "${GREEN}   http://${IP_FOR_OUTPUT}:8080${NC}\n"
-echo -e "${YELLOW}   1. Open the URL in your browser${NC}"
-echo -e "${YELLOW}   2. Create a local account${NC}"
-echo -e "${YELLOW}   3. Click model selector -> Pull a model${NC}"
-echo -e "${YELLOW}   4. Find models: ollama.com/library or huggingface.co${NC}\n"
+echo -e "${CYAN}🔒 Starting secure SSH tunnel...${NC}\n"
+echo -e "${GREEN}   Open your browser to: http://localhost:8080${NC}\n"
+echo -e "${YELLOW}   1. Open http://localhost:8080 in your browser${NC}"
+echo -e "${YELLOW}   2. Click model selector -> Pull a model${NC}"
+echo -e "${YELLOW}   3. Find models: ollama.com/library or huggingface.co${NC}\n"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
-echo -e "${CYAN}💻 OPTIONAL: SSH Terminal Access${NC}"
-read -p "Press Enter to connect via SSH for CLI access (or Ctrl+C to exit): "
+echo -e "${CYAN}🔐 SSH Tunnel Active - Keep this terminal open!${NC}"
+echo -e "${CYAN}   Press Ctrl+C to disconnect${NC}\n"
 
-# Final connection for SSH users
-ssh -i generated_key.pem ubuntu@${IP}
+# Start SSH tunnel with port forwarding
+ssh -i generated_key.pem -o StrictHostKeyChecking=no \
+    -L 8080:localhost:8080 \
+    -L 11434:localhost:11434 \
+    -L 9099:localhost:9099 \
+    ubuntu@${IP}

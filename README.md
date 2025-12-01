@@ -4,6 +4,8 @@ This repository contains **Infrastructure as Code (Terraform)** to spin up a pow
 
 It features a **Dual Mode** switch so you can test immediately with a CPU, or run full AI workloads with a GPU (available after AWS quota increase approval).
 
+**🔒 Security:** Your AI lab is **not exposed to the internet**. All access is secured through SSH tunneling, and Open WebUI runs in single-user mode (no authentication required).
+
 ## 🎯 Project Goal
 
 To create a **"dispose-on-demand"** AI lab. We use Terraform to automate the creation and destruction of the infrastructure, ensuring we only pay for the exact time we are using the resources.
@@ -139,7 +141,7 @@ Once your lab is running, you can pull any model available through Ollama or Hug
 
 ### How to Install a Model
 
-1. Open the WebUI at `http://YOUR_IP:8080`
+1. Open the WebUI at `http://localhost:8080` (via SSH tunnel)
 2. Click the **model selector** dropdown (top of chat)
 3. Click **"Pull a model from Ollama.com"**
 4. Enter one of:
@@ -193,42 +195,48 @@ terraform apply -var="lab_mode=gpu" -var="gpu_size=xlarge"
 
 *Type `yes` when prompted.*
 
-### 3\. Monitor Setup Progress ⚡
+### 3\. Connect via Secure SSH Tunnel ⚡
 
 **After `terraform apply` completes, the instance is booting and installing software.**
 
-Run this script to watch the installation progress in real-time:
+Run this script to establish a secure SSH tunnel and monitor setup progress:
 
 ```bash
 ./connect.sh
 ```
 
-**What it shows:**
-- ✅ Instance boot status
-- ✅ Ollama service installation
-- ✅ Docker & Open WebUI startup
-- ✅ Live installation logs
+**What it does:**
+- ✅ Creates an encrypted SSH tunnel to your instance
+- ✅ Forwards ports securely to `localhost` (8080, 11434, 9099)
+- ✅ Monitors installation progress in real-time
+- ✅ Shows live logs until setup is complete
 
-**Timeline:** The script will monitor for 2-3 minutes until everything is ready, then display the WebUI URL.
+**Timeline:** The script will monitor for 2-3 minutes until everything is ready.
 
-**Note:** The script also offers optional SSH access for advanced users who want to explore the server internals, but this is not necessary for normal use.
+**Important:** Keep this terminal window open! Closing it will disconnect the tunnel.
 
 ### 4\. Access Your AI Lab 🎉
 
-Once `connect.sh` shows "SETUP COMPLETE", open the Web Interface:
+Once [`connect.sh`](connect.sh) shows "SETUP COMPLETE", the SSH tunnel is active.
 
 #### **Web Interface (ChatGPT-like UI)** 🌐
 
-1. Open the URL shown by `connect.sh` in your browser:
+1. **Open your browser to:**
    ```
-   http://YOUR_INSTANCE_IP:8080
+   http://localhost:8080
    ```
 
-2. Create a local account (stored only on your instance)
+2. **No login required!** Open WebUI runs in single-user admin mode.
 
 3. **Pull a model** using the model selector (see [Finding and Installing Models](#-finding-and-installing-models) above)
 
 4. Start chatting with your AI model!
+
+**🔒 Security Notes:**
+- Your AI lab is **NOT accessible from the internet**
+- Only accessible through the SSH tunnel on your local machine
+- No authentication needed (you are the only user)
+- All traffic is encrypted through SSH
 
 ### 5\. Tear Down (The "Stop Billing" Button)
 
