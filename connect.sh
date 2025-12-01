@@ -151,12 +151,14 @@ ssh -i generated_key.pem -o StrictHostKeyChecking=no ubuntu@${IP} << 'ENDSSH'
         sleep 3
     done
     
-    # Final check for WebUI
-    echo "⏳ Waiting for WebUI to be fully ready..."
-    for i in {1..20}; do
-        if sudo docker ps 2>/dev/null | grep -q open-webui; then
+    # Wait for WebUI to be fully responsive (HTTP health check)
+    echo "⏳ Waiting for WebUI to accept HTTP connections..."
+    for i in {1..30}; do
+        if curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 | grep -q "200\|301\|302"; then
+            echo "✓ WebUI is now accessible!"
             break
         fi
+        echo -n "."
         sleep 2
     done
     

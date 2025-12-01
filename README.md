@@ -152,6 +152,57 @@ Once your lab is running, you can pull any model available through Ollama or Hug
 
 -----
 
+## 📚 RAG: Chat with Your Documents
+
+### What is RAG?
+
+**RAG (Retrieval-Augmented Generation)** allows your AI to answer questions based on YOUR documents, not just its training data.
+
+**How it works:**
+1. Upload your files (PDFs, Word docs, text files, etc.)
+2. The system converts them to searchable embeddings
+3. When you ask a question, it finds relevant chunks from your docs
+4. The LLM answers using those chunks as context
+5. You get citations showing which document was used
+
+**Example Use Cases:**
+- 📖 "Summarize this research paper"
+- 📋 "What does our contract say about refunds?"
+- 💼 "Compare the features in these three proposals"
+- 🎓 "Quiz me on this textbook chapter"
+
+### Your AI Lab Has RAG Built-In! ✅
+
+Open WebUI includes a powerful document system with:
+- **File upload:** PDF, DOCX, TXT, CSV, Markdown, code files, images (with OCR)
+- **Batch upload:** Drag & drop entire folders
+- **Web scraping:** Import content from URLs
+- **Vector database:** Automatic embedding storage (ChromaDB)
+- **Collections:** Organize docs by topic/project
+- **Source citations:** See which document the AI referenced
+
+### How to Use RAG
+
+#### Method 1: Quick Upload (Single Conversation)
+
+1. Start a new chat in the WebUI
+2. Click the **plus icon** (bottom left of chat input)
+3. Select **"Upload Files"** or **"Attach Webpage"**
+4. Choose your file(s), drag & drop, or paste a URL
+5. Wait for processing (you'll see a progress bar)
+6. Ask questions about the uploaded content!
+
+**Pro Tip:** Files uploaded this way are only available in that specific chat.
+
+#### Method 2: Knowledge Base (Reusable Across All Chats)
+
+1. Click **"Workspace"** in the left sidebar
+2. Go to the **"Knowledge"** tab
+3. Create a knowledge base and upload your documents
+4. In any chat, select your knowledge base from the **plus icon** menu
+5. Now ALL chats can reference those documents!
+
+
 ## 🚀 Usage
 
 ### 1\. Initialize
@@ -234,7 +285,9 @@ Once [`connect.sh`](connect.sh) shows "SETUP COMPLETE", the SSH tunnel is active
 
 3. **Pull a model** using the model selector (see [Finding and Installing Models](#-finding-and-installing-models) above)
 
-4. Start chatting with your AI model!
+4. **Upload documents** for RAG (see [RAG: Chat with Your Documents](#-rag-chat-with-your-documents) above)
+
+5. Start chatting with your AI model!
 
 **🔒 Security Notes:**
 - Your AI lab is **NOT accessible from the internet**
@@ -251,6 +304,8 @@ Once [`connect.sh`](connect.sh) shows "SETUP COMPLETE", the SSH tunnel is active
 ### 5\. Tear Down (The "Stop Billing" Button)
 
 **Crucial:** When you are done, run this immediately.
+
+**⚠️ Warning:** This will delete all uploaded documents and conversation history.
 
 **Steps:**
 1. Type `exit` in the [`connect.sh`](connect.sh) terminal to close the SSH tunnel
