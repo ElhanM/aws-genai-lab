@@ -30,6 +30,7 @@ This script will:
   ✓ Monitor installation progress  
   ✓ Forward ports securely to localhost
   ✓ Show real-time setup logs
+  ✓ Give you an interactive shell on the instance
 
 Once complete (2-3 minutes), access the WebUI at:
 
@@ -43,6 +44,7 @@ Once complete (2-3 minutes), access the WebUI at:
    • Only accessible through SSH tunnel
    • No authentication required (single-user mode)
    • Keep the connect.sh terminal open while using
+   • Type 'exit' in the terminal to disconnect
 
 📦 FIND MODELS:
    • Ollama Library: ollama.com/library

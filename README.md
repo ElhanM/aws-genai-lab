@@ -210,10 +210,14 @@ Run this script to establish a secure SSH tunnel and monitor setup progress:
 - ✅ Forwards ports securely to `localhost` (8080, 11434, 9099)
 - ✅ Monitors installation progress in real-time
 - ✅ Shows live logs until setup is complete
+- ✅ Drops you into an interactive shell on the EC2 instance
 
 **Timeline:** The script will monitor for 2-3 minutes until everything is ready.
 
-**Important:** Keep this terminal window open! Closing it will disconnect the tunnel.
+**Important Notes:**
+- **Keep this terminal window open!** The SSH tunnel is active while the session is open.
+- **To disconnect:** Type `exit` in the terminal (or close the window)
+- **The "Connection refused" messages are normal** - they appear when your browser tries to connect before the services are fully ready. They'll disappear once everything starts.
 
 ### 4\. Access Your AI Lab 🎉
 
@@ -237,10 +241,20 @@ Once [`connect.sh`](connect.sh) shows "SETUP COMPLETE", the SSH tunnel is active
 - Only accessible through the SSH tunnel on your local machine
 - No authentication needed (you are the only user)
 - All traffic is encrypted through SSH
+- The tunnel remains active as long as the [`connect.sh`](connect.sh) terminal session is open
+
+**💡 Working with the Terminal:**
+- You can run commands on the EC2 instance directly (e.g., `docker ps`, `ollama list`)
+- Type `exit` to close the SSH session and stop the tunnel
+- To reconnect, just run `./connect.sh` again
 
 ### 5\. Tear Down (The "Stop Billing" Button)
 
 **Crucial:** When you are done, run this immediately.
+
+**Steps:**
+1. Type `exit` in the [`connect.sh`](connect.sh) terminal to close the SSH tunnel
+2. Run the destroy command:
 
 **For CPU mode:**
 ```bash

@@ -46,6 +46,33 @@ check_webui() {
     return $?
 }
 
+# Function to show connection instructions and start tunnel
+start_tunnel() {
+    echo ""
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${MAGENTA}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${MAGENTA}║                    🎉 ALL READY! 🎉                        ║${NC}"
+    echo -e "${MAGENTA}╚════════════════════════════════════════════════════════════╝${NC}\n"
+    echo -e "${CYAN}🔒 Starting secure SSH tunnel...${NC}\n"
+    echo -e "${GREEN}   Open your browser to: http://localhost:8080${NC}\n"
+    echo -e "${YELLOW}📝 Next steps:${NC}"
+    echo -e "${YELLOW}   1. Open http://localhost:8080 in your browser${NC}"
+    echo -e "${YELLOW}   2. Click model selector -> Pull a model${NC}"
+    echo -e "${YELLOW}   3. Find models: ollama.com/library or huggingface.co${NC}\n"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+    echo -e "${CYAN}🔐 SSH Tunnel Active & Interactive Shell Ready${NC}"
+    echo -e "${YELLOW}   • You can run commands on the EC2 instance (e.g., 'docker ps', 'ollama list')${NC}"
+    echo -e "${YELLOW}   • To disconnect: type 'exit' and press Enter${NC}"
+    echo -e "${YELLOW}   • To reconnect: run './connect.sh' again${NC}\n"
+    
+    # Start SSH tunnel with port forwarding
+    ssh -i generated_key.pem -o StrictHostKeyChecking=no \
+        -L 8080:localhost:8080 \
+        -L 11434:localhost:11434 \
+        -L 9099:localhost:9099 \
+        ubuntu@${IP}
+}
+
 # Wait for SSH to be available
 echo -e "${YELLOW}⏳ Step 1/2: Waiting for instance to boot and SSH to be ready...${NC}"
 COUNTER=0
@@ -67,21 +94,7 @@ if check_ready && check_webui; then
     echo -e "${MAGENTA}╔════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${MAGENTA}║                    🎉 SETUP COMPLETE! 🎉                   ║${NC}"
     echo -e "${MAGENTA}╚════════════════════════════════════════════════════════════╝${NC}\n"
-    echo -e "${CYAN}🔒 Starting SSH tunnel to access WebUI securely...${NC}\n"
-    echo -e "${GREEN}   Open your browser to: http://localhost:8080${NC}\n"
-    echo -e "${YELLOW}📝 Next steps:${NC}"
-    echo -e "${YELLOW}   1. Open http://localhost:8080 in your browser${NC}"
-    echo -e "${YELLOW}   2. Click the model selector -> Pull a model${NC}"
-    echo -e "${YELLOW}   3. Browse models at ollama.com/library or huggingface.co${NC}\n"
-    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
-    echo -e "${CYAN}🔐 SSH Tunnel Active - Press Ctrl+C to disconnect${NC}\n"
-    
-    # Start SSH tunnel with port forwarding
-    ssh -i generated_key.pem -o StrictHostKeyChecking=no \
-        -L 8080:localhost:8080 \
-        -L 11434:localhost:11434 \
-        -L 9099:localhost:9099 \
-        ubuntu@${IP}
+    start_tunnel
     exit 0
 fi
 
@@ -129,7 +142,7 @@ ssh -i generated_key.pem -o StrictHostKeyChecking=no ubuntu@${IP} << 'ENDSSH'
         fi
         echo ""
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        echo "⏱️  Monitoring... (Press Ctrl+C to disconnect, setup continues)"
+        echo "⏱️  Monitoring installation progress..."
     }
     
     # Show progress until ready
@@ -156,23 +169,5 @@ ssh -i generated_key.pem -o StrictHostKeyChecking=no ubuntu@${IP} << 'ENDSSH'
     sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 ENDSSH
 
-echo ""
-echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${MAGENTA}╔════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${MAGENTA}║                    🎉 ALL READY! 🎉                        ║${NC}"
-echo -e "${MAGENTA}╚════════════════════════════════════════════════════════════╝${NC}\n"
-echo -e "${CYAN}🔒 Starting secure SSH tunnel...${NC}\n"
-echo -e "${GREEN}   Open your browser to: http://localhost:8080${NC}\n"
-echo -e "${YELLOW}   1. Open http://localhost:8080 in your browser${NC}"
-echo -e "${YELLOW}   2. Click model selector -> Pull a model${NC}"
-echo -e "${YELLOW}   3. Find models: ollama.com/library or huggingface.co${NC}\n"
-echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
-echo -e "${CYAN}🔐 SSH Tunnel Active - Keep this terminal open!${NC}"
-echo -e "${CYAN}   Press Ctrl+C to disconnect${NC}\n"
-
-# Start SSH tunnel with port forwarding
-ssh -i generated_key.pem -o StrictHostKeyChecking=no \
-    -L 8080:localhost:8080 \
-    -L 11434:localhost:11434 \
-    -L 9099:localhost:9099 \
-    ubuntu@${IP}
+# After monitoring is done, start the tunnel
+start_tunnel

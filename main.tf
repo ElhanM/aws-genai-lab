@@ -144,7 +144,7 @@ resource "aws_instance" "lab_instance" {
   subnet_id = length(data.aws_subnets.default.ids) > 0 ? data.aws_subnets.default.ids[0] : aws_subnet.default_subnet[0].id
 
   root_block_device {
-    volume_size = 60
+    volume_size = 100
     volume_type = "gp3"
   }
 
