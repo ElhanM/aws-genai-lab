@@ -47,6 +47,7 @@ check_webui() {
 }
 
 # Function to show connection instructions and start tunnel
+# Function to show connection instructions and start tunnel
 start_tunnel() {
     echo ""
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -65,12 +66,22 @@ start_tunnel() {
     echo -e "${YELLOW}   • To disconnect: type 'exit' and press Enter${NC}"
     echo -e "${YELLOW}   • To reconnect: run './connect.sh' again${NC}\n"
     
-    # Start SSH tunnel with port forwarding
-    ssh -i generated_key.pem -o StrictHostKeyChecking=no \
+    # Start SSH tunnel with port forwarding and interactive shell
+    # Added -o ServerAliveInterval=60 to keep connection alive
+    # Added -o ServerAliveCountMax=3 to detect dead connections
+    # These options ensure the SSH client properly detects when the session ends
+    ssh -i generated_key.pem \
+        -o StrictHostKeyChecking=no \
+        -o ExitOnForwardFailure=yes \
+        -o ServerAliveInterval=60 \
+        -o ServerAliveCountMax=3 \
         -L 8080:localhost:8080 \
         -L 11434:localhost:11434 \
         -L 9099:localhost:9099 \
-        ubuntu@${IP}
+        ubuntu@${IP} || true
+    
+    # This line executes after SSH session ends
+    echo -e "\n${GREEN}✓ SSH tunnel closed successfully${NC}"
 }
 
 # Wait for SSH to be available
