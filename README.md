@@ -90,13 +90,21 @@ Run with `lab_mode=gpu` and set `gpu_size`.
 
 Once the lab is running, you interact with it via **Open WebUI**.
 
-### Installing Models
+### 🤖 Finding & Installing Models
 
-1.  **Find a model:**
-      * [Ollama Library](https://ollama.com/library) (e.g., `llama3`)
-      * [Hugging Face GGUF](https://huggingface.co/models?library=gguf) (look for "Ollama" run commands).
-2.  **In WebUI:** Click the model selector -\> **"Pull a model from Ollama.com"**.
-3.  **Enter tag:** Paste the model tag (e.g., `CognitiveComputations/dolphin-llama3.1:8b`) and click **Pull**.
+1.  **Find a Model Tag:**
+    * **[Ollama Library](https://ollama.com/library):** Search for a model tag (e.g., `CognitiveComputations/dolphin-llama3.1:8b`).
+    * **[Hugging Face GGUF](https://huggingface.co/models?library=gguf):** Find a model, then click **"Use this model"** $\to$ **"Ollama"** to get the command.
+
+2.  **Open the Downloader:**
+    In the WebUI, click the **model selector** (top of chat) $\to$ **"Pull a model from Ollama.com"**.
+
+3.  **Enter Tag & Pull:**
+    Paste the tag or command into the box and click the download button.
+
+    > **Examples:**
+    > * **Ollama Tag:** `CognitiveComputations/dolphin-llama3.1:8b`
+    > * **Hugging Face Command:** `ollama run hf.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M`
 
 ### RAG (Chat with Documents)
 
