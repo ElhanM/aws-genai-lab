@@ -170,7 +170,6 @@ Open your browser to:
 
 ```
 http://localhost:8080
-
 ```
 
 You can now pull models and upload documents as described in the **Models & RAG** section above.
