@@ -18,9 +18,9 @@ if [ -z "$IP" ]; then
     exit 1
 fi
 
-echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║      AWS GenAI Lab - Setup Progress Monitor 🚀             ║${NC}"
-echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}"
+echo -e "${BLUE}|============================================================|${NC}"
+echo -e "${BLUE}|      AWS GenAI Lab - Setup Progress Monitor                |${NC}"
+echo -e "${BLUE}|============================================================|${NC}"
 echo -e "${YELLOW}Instance IP: ${IP}${NC}"
 echo -e "${CYAN}WebUI URL (via tunnel): http://localhost:8080${NC}"
 echo ""
@@ -47,24 +47,23 @@ check_webui() {
 }
 
 # Function to show connection instructions and start tunnel
-# Function to show connection instructions and start tunnel
 start_tunnel() {
     echo ""
-    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${MAGENTA}╔════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${MAGENTA}║                    🎉 ALL READY! 🎉                        ║${NC}"
-    echo -e "${MAGENTA}╚════════════════════════════════════════════════════════════╝${NC}\n"
-    echo -e "${CYAN}🔒 Starting secure SSH tunnel...${NC}\n"
+    echo -e "${GREEN}==========================================================${NC}"
+    echo -e "${MAGENTA}|============================================================|${NC}"
+    echo -e "${MAGENTA}|                       ALL READY!                           |${NC}"
+    echo -e "${MAGENTA}|============================================================|${NC}\n"
+    echo -e "${CYAN}   Starting secure SSH tunnel...${NC}\n"
     echo -e "${GREEN}   Open your browser to: http://localhost:8080${NC}\n"
-    echo -e "${YELLOW}📝 Next steps:${NC}"
+    echo -e "${YELLOW}   Next steps:${NC}"
     echo -e "${YELLOW}   1. Open http://localhost:8080 in your browser${NC}"
     echo -e "${YELLOW}   2. Click model selector -> Pull a model${NC}"
     echo -e "${YELLOW}   3. Find models: ollama.com/library or huggingface.co${NC}\n"
-    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
-    echo -e "${CYAN}🔐 SSH Tunnel Active & Interactive Shell Ready${NC}"
-    echo -e "${YELLOW}   • You can run commands on the EC2 instance (e.g., 'docker ps', 'ollama list')${NC}"
-    echo -e "${YELLOW}   • To disconnect: type 'exit' and press Enter${NC}"
-    echo -e "${YELLOW}   • To reconnect: run './connect.sh' again${NC}\n"
+    echo -e "${BLUE}==========================================================${NC}\n"
+    echo -e "${CYAN}   SSH Tunnel Active & Interactive Shell Ready${NC}"
+    echo -e "${YELLOW}   - You can run commands on the EC2 instance (e.g., 'docker ps', 'ollama list')${NC}"
+    echo -e "${YELLOW}   - To disconnect: type 'exit' and press Enter${NC}"
+    echo -e "${YELLOW}   - To reconnect: run './connect.sh' again${NC}\n"
     
     # Start SSH tunnel with port forwarding and interactive shell
     # Added -o ServerAliveInterval=60 to keep connection alive
@@ -81,11 +80,11 @@ start_tunnel() {
         ubuntu@${IP} || true
     
     # This line executes after SSH session ends
-    echo -e "\n${GREEN}✓ SSH tunnel closed successfully${NC}"
+    echo -e "\n${GREEN}   SSH tunnel closed successfully${NC}"
 }
 
 # Wait for SSH to be available
-echo -e "${YELLOW}⏳ Step 1/2: Waiting for instance to boot and SSH to be ready...${NC}"
+echo -e "${YELLOW}   Step 1/2: Waiting for instance to boot and SSH to be ready...${NC}"
 COUNTER=0
 MAX_WAIT=60
 while ! check_ssh; do
@@ -97,20 +96,20 @@ while ! check_ssh; do
         exit 1
     fi
 done
-echo -e "\n${GREEN}✓ SSH is ready!${NC}\n"
+echo -e "\n${GREEN}   SSH is ready!${NC}\n"
 
 # Check if setup is already complete
 if check_ready && check_webui; then
-    echo -e "${GREEN}✓✓✓ Instance is fully configured and ready! ✓✓✓${NC}\n"
-    echo -e "${MAGENTA}╔════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${MAGENTA}║                    🎉 SETUP COMPLETE! 🎉                   ║${NC}"
-    echo -e "${MAGENTA}╚════════════════════════════════════════════════════════════╝${NC}\n"
+    echo -e "${GREEN}       Instance is fully configured and ready!       ${NC}\n"
+    echo -e "${MAGENTA}|============================================================|${NC}"
+    echo -e "${MAGENTA}|                       SETUP COMPLETE!                      |${NC}"
+    echo -e "${MAGENTA}|============================================================|${NC}\n"
     start_tunnel
     exit 0
 fi
 
 # Show setup progress
-echo -e "${YELLOW}⏳ Step 2/2: Installing Ollama and Open WebUI...${NC}"
+echo -e "${YELLOW}   Step 2/2: Installing Ollama and Open WebUI...${NC}"
 echo -e "${BLUE}This will take 2-3 minutes.${NC}\n"
 
 # Monitor progress with live updates
@@ -118,42 +117,42 @@ ssh -i generated_key.pem -o StrictHostKeyChecking=no ubuntu@${IP} << 'ENDSSH'
     # Function to show progress
     show_progress() {
         clear
-        echo "╔════════════════════════════════════════════════════════════╗"
-        echo "║           AWS GenAI Lab - Installation Progress           ║"
-        echo "╚════════════════════════════════════════════════════════════╝"
+        echo "|============================================================|"
+        echo "|           AWS GenAI Lab - Installation Progress           |"
+        echo "|============================================================|"
         echo ""
         
         # Check Ollama service
-        echo "📦 Ollama Service Status:"
+        echo "   Ollama Service Status:"
         if systemctl is-active --quiet ollama; then
-            echo "   ✓ Ollama service: Running"
+            echo "      Ollama service: Running"
         else
-            echo "   ⏳ Ollama service: Installing..."
+            echo "      Ollama service: Installing..."
         fi
         echo ""
         
         # Check Docker installation
-        echo "🐳 Docker & WebUI Status:"
+        echo "   Docker & WebUI Status:"
         if systemctl is-active --quiet docker; then
-            echo "   ✓ Docker: Running"
+            echo "      Docker: Running"
             if docker ps 2>/dev/null | grep -q open-webui; then
-                echo "   ✓ Open WebUI: Running on localhost:8080"
+                echo "      Open WebUI: Running on localhost:8080"
             else
-                echo "   ⏳ Open WebUI: Starting..."
+                echo "      Open WebUI: Starting..."
             fi
         else
-            echo "   ⏳ Docker: Installing..."
+            echo "      Docker: Installing..."
         fi
         echo ""
         
         # Show recent logs
-        echo "📋 Recent Activity:"
+        echo "   Recent Activity:"
         if [ -f /var/log/user-data.log ]; then
             tail -5 /var/log/user-data.log | sed 's/^/   /'
         fi
         echo ""
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        echo "⏱️  Monitoring installation progress..."
+        echo "=========================================================="
+        echo "   Monitoring installation progress..."
     }
     
     # Show progress until ready
@@ -163,10 +162,10 @@ ssh -i generated_key.pem -o StrictHostKeyChecking=no ubuntu@${IP} << 'ENDSSH'
     done
     
     # Wait for WebUI to be fully responsive (HTTP health check)
-    echo "⏳ Waiting for WebUI to accept HTTP connections..."
+    echo "   Waiting for WebUI to accept HTTP connections..."
     for i in {1..30}; do
         if curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 | grep -q "200\|301\|302"; then
-            echo "✓ WebUI is now accessible!"
+            echo "   WebUI is now accessible!"
             break
         fi
         echo -n "."
@@ -174,11 +173,11 @@ ssh -i generated_key.pem -o StrictHostKeyChecking=no ubuntu@${IP} << 'ENDSSH'
     done
     
     clear
-    echo "╔════════════════════════════════════════════════════════════╗"
-    echo "║                  ✓✓✓ SETUP COMPLETE! ✓✓✓                 ║"
-    echo "╚════════════════════════════════════════════════════════════╝"
+    echo "|============================================================|"
+    echo "|                         SETUP COMPLETE!                        |"
+    echo "|============================================================|"
     echo ""
-    echo "🐳 Running Containers:"
+    echo "   Running Containers:"
     sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 ENDSSH
 
