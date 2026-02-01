@@ -1,13 +1,13 @@
 variable "aws_region" {
   description = "The AWS region to deploy in (must match your quota approval)"
   type        = string
-  default     = "us-east-1" 
+  default     = "us-east-1"
 }
 
 variable "lab_mode" {
   description = "Choose 'cpu' for testing (no quota needed) or 'gpu' for AI power (requires quota)"
   type        = string
-  default     = "cpu" 
+  default     = "cpu"
   validation {
     condition     = contains(["cpu", "gpu"], var.lab_mode)
     error_message = "The lab_mode must be either 'cpu' or 'gpu'."

@@ -5,11 +5,11 @@ terraform {
       version = "~> 5.0"
     }
     tls = {
-      source = "hashicorp/tls"
+      source  = "hashicorp/tls"
       version = "~> 4.0"
     }
     local = {
-      source = "hashicorp/local"
+      source  = "hashicorp/local"
       version = "~> 2.0"
     }
   }
@@ -24,16 +24,16 @@ provider "aws" {
 # --- 1. Dynamic Hardware Selection ---
 locals {
   # CPU Instance (Always the same)
-  cpu_instance = "t3.xlarge"  # 4 vCPU, 16GB RAM
-  
+  cpu_instance = "t3.xlarge" # 4 vCPU, 16GB RAM
+
   # GPU Instance Sizes (Focused on GPU count for model capacity)
   gpu_instances = {
-    small  = "g5.xlarge"    # 1 GPU  (24GB VRAM)   - Quota: 4 vCPUs
-    medium = "g5.12xlarge"  # 4 GPUs (96GB VRAM)   - Quota: 48 vCPUs
-    large  = "g5.24xlarge"  # 4 GPUs (96GB VRAM)   - Quota: 96 vCPUs
-    xlarge = "g5.48xlarge"  # 8 GPUs (192GB VRAM)  - Quota: 192 vCPUs
+    small  = "g5.xlarge"   # 1 GPU  (24GB VRAM)   - Quota: 4 vCPUs
+    medium = "g5.12xlarge" # 4 GPUs (96GB VRAM)   - Quota: 48 vCPUs
+    large  = "g5.24xlarge" # 4 GPUs (96GB VRAM)   - Quota: 96 vCPUs
+    xlarge = "g5.48xlarge" # 8 GPUs (192GB VRAM)  - Quota: 192 vCPUs
   }
-  
+
   # Final instance selection
   selected_instance = var.lab_mode == "cpu" ? local.cpu_instance : local.gpu_instances[var.gpu_size]
 }
@@ -133,13 +133,13 @@ data "aws_ami" "ubuntu_ami" {
 resource "aws_instance" "lab_instance" {
   # Select the right AMI based on the mode
   ami = var.lab_mode == "gpu" ? data.aws_ami.deep_learning_ami[0].id : data.aws_ami.ubuntu_ami[0].id
-  
+
   # Select the right Instance Type based on mode and size
   instance_type = local.selected_instance
-  
-  key_name      = aws_key_pair.generated_key.key_name
+
+  key_name               = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = [aws_security_group.ai_lab_sg.id]
-  
+
   # Use existing subnet if available, otherwise use the one we created
   subnet_id = length(data.aws_subnets.default.ids) > 0 ? data.aws_subnets.default.ids[0] : aws_subnet.default_subnet[0].id
 
