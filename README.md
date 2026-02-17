@@ -62,11 +62,8 @@ New AWS accounts have a default quota of **0 vCPUs** for GPU instances. You must
 * **Large (4 GPUs, High CPU):** Request **96 vCPUs**
 * **XLarge (8 GPUs):** Request **192 vCPUs**
 
-
 6. If prompted for justification, use:
 > "I am requesting a quota increase to run self-hosted LLMs for personal research. I plan to spin up these instances on-demand to interact with open-source models from Hugging Face. The larger GPU configurations allow me to experiment with a wide range of model sizes. Self-hosting on AWS also ensures I can use AI without third-party providers collecting my data. I am using Terraform to manage these resources efficiently and will destroy them when not in use. This is strictly for personal education and testing; there is no production or business traffic."
-
-
 
 ## Hardware Selection
 
@@ -101,20 +98,13 @@ Once the lab is running, you interact with it via **Open WebUI**.
 * **[Ollama Library](https://ollama.com/library):** Search for a model tag (e.g., `CognitiveComputations/dolphin-llama3.1:8b`).
 * **[Hugging Face GGUF](https://huggingface.co/models?library=gguf):** Find a model, then click **"Use this model"**  **"Ollama"** to get the command.
 
-
 2. **Open the Downloader:**
 In the WebUI, click the **model selector** (top of chat)  **"Pull a model from Ollama.com"**.
 3. **Enter Tag & Pull:**
 Paste the tag or command into the box and click the download button.
 > **Examples:**
-
-
 > * **Ollama Tag:** `CognitiveComputations/dolphin-llama3.1:8b`
 > * **Hugging Face Command:** `ollama run hf.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M`
-> 
-> 
-
-
 
 ### RAG (Chat with Documents)
 
