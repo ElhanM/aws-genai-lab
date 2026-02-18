@@ -23,19 +23,16 @@ provider "aws" {
 
 # --- 1. Dynamic Hardware Selection ---
 locals {
-  # CPU Instance (Always the same)
-  cpu_instance = "t3.xlarge" # 4 vCPU, 16GB RAM
-
-  # GPU Instance Sizes (Focused on GPU count for model capacity)
-  gpu_instances = {
-    small  = "g5.xlarge"   # 1 GPU  (24GB VRAM)   - Quota: 4 vCPUs
-    medium = "g5.12xlarge" # 4 GPUs (96GB VRAM)   - Quota: 48 vCPUs
-    large  = "g5.24xlarge" # 4 GPUs (96GB VRAM)   - Quota: 96 vCPUs
-    xlarge = "g5.48xlarge" # 8 GPUs (192GB VRAM)  - Quota: 192 vCPUs
+  instance_map = {
+    cpu        = "t3.xlarge"    # 4 vCPU, 16GB RAM
+    gpu_small  = "g5.xlarge"    # 1 GPU  (24GB VRAM)  - Quota: 4 vCPUs
+    gpu_medium = "g5.12xlarge"  # 4 GPUs (96GB VRAM)  - Quota: 48 vCPUs
+    gpu_large  = "g5.24xlarge"  # 4 GPUs (96GB VRAM)  - Quota: 96 vCPUs
+    gpu_xlarge = "g5.48xlarge"  # 8 GPUs (192GB VRAM) - Quota: 192 vCPUs
   }
 
-  # Final instance selection
-  selected_instance = var.lab_mode == "cpu" ? local.cpu_instance : local.gpu_instances[var.gpu_size]
+  selected_instance = local.instance_map[var.instance_size]
+  is_gpu            = var.instance_size != "cpu"
 }
 
 # --- 2. Networking & Security ---
@@ -109,7 +106,7 @@ resource "local_file" "private_key" {
 # --- 4. AMI Selection (The Brains) ---
 # If GPU mode, get the NVIDIA Deep Learning AMI (Has drivers pre-installed)
 data "aws_ami" "deep_learning_ami" {
-  count       = var.lab_mode == "gpu" ? 1 : 0
+  count       = local.is_gpu ? 1 : 0
   most_recent = true
   owners      = ["amazon"]
   filter {
@@ -120,7 +117,7 @@ data "aws_ami" "deep_learning_ami" {
 
 # If CPU mode, get standard Ubuntu 22.04 (Lighter, faster boot)
 data "aws_ami" "ubuntu_ami" {
-  count       = var.lab_mode == "cpu" ? 1 : 0
+  count       = local.is_gpu ? 0 : 1
   most_recent = true
   owners      = ["099720109477"] # Canonical
   filter {
@@ -131,10 +128,7 @@ data "aws_ami" "ubuntu_ami" {
 
 # --- 5. The Instance ---
 resource "aws_instance" "lab_instance" {
-  # Select the right AMI based on the mode
-  ami = var.lab_mode == "gpu" ? data.aws_ami.deep_learning_ami[0].id : data.aws_ami.ubuntu_ami[0].id
-
-  # Select the right Instance Type based on mode and size
+  ami           = local.is_gpu ? data.aws_ami.deep_learning_ami[0].id : data.aws_ami.ubuntu_ami[0].id
   instance_type = local.selected_instance
 
   key_name               = aws_key_pair.generated_key.key_name
@@ -224,6 +218,6 @@ resource "aws_instance" "lab_instance" {
               EOF
 
   tags = {
-    Name = "AWS-GenAI-Lab-${var.lab_mode}${var.lab_mode == "gpu" ? "-${var.gpu_size}" : ""}"
+    Name = "AWS-GenAI-Lab-${var.instance_size}"
   }
 }

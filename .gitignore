@@ -26,3 +26,6 @@ terraform.rc
 
 # Ignore generated SSH key
 generated_key.pem
+
+# Ignore my notes directory
+notes

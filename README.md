@@ -67,26 +67,13 @@ New AWS accounts have a default quota of **0 vCPUs** for GPU instances. You must
 
 ## Hardware Selection
 
-### CPU Mode (No Quota Needed)
-
-Run with `lab_mode=cpu`.
-
-| Instance | vCPUs | RAM | Cost/Hour | Use Case |
-| --- | --- | --- | --- | --- |
-| `t3.xlarge` | 4 | 16GB | ~$0.17 | Testing Terraform, small models (≤7B) |
-
-### GPU Mode (Requires Quota)
-
-Run with `lab_mode=gpu` and set `gpu_size`.
-
-| Size Flag | Instance | GPUs | VRAM | vCPU Quota | Cost/Hour | Target Model Size |
-| --- | --- | --- | --- | --- | --- | --- |
-| `small` | `g5.xlarge` | 1 | 24GB | 4 | ~$1.01 | **7B-13B Q8** |
-| `medium` | `g5.12xlarge` | 4 | 96GB | 48 | ~$5.67 | **30B-34B Q8** |
-| `large` | `g5.24xlarge` | 4 | 96GB | 96 | ~$8.14 | **70B Q8** |
-| `xlarge` | `g5.48xlarge` | 8 | 192GB | 192 | ~$16.29 | **120B Q8** |
-
-*Note: `large` has the same VRAM as `medium` but double the system RAM/CPU for faster inference.*
+| Size Flag    | Instance      | GPUs | VRAM  | vCPU Quota | Cost/Hour | Target Model Size    |
+| ------------ | ------------- | ---- | ----- | ---------- | --------- | -------------------- |
+| `cpu`        | `t3.xlarge`   | -    | -     | None       | ~$0.17    | Testing, models <=7B |
+| `gpu_small`  | `g5.xlarge`   | 1    | 24GB  | 4          | ~$1.01    | 7B-13B Q8            |
+| `gpu_medium` | `g5.12xlarge` | 4    | 96GB  | 48         | ~$5.67    | 30B-34B Q8           |
+| `gpu_large`  | `g5.24xlarge` | 4    | 96GB  | 96         | ~$8.14    | 70B Q8               |
+| `gpu_xlarge` | `g5.48xlarge` | 8    | 192GB | 192        | ~$16.29   | 120B Q8              |
 
 ## Models & RAG Capabilities
 
@@ -95,14 +82,14 @@ Once the lab is running, you interact with it via **Open WebUI**.
 ### Finding & Installing Models
 
 1. **Find a Model Tag:**
-* **[Ollama Library](https://ollama.com/library):** Search for a model tag (e.g., `CognitiveComputations/dolphin-llama3.1:8b`).
-* **[Hugging Face GGUF](https://huggingface.co/models?library=gguf):** Find a model, then click **"Use this model"**  **"Ollama"** to get the command.
-
+    * **[Ollama Library](https://ollama.com/library):** Search for a model tag (e.g., `CognitiveComputations/dolphin-llama3.1:8b`).
+    * **[Hugging Face GGUF](https://huggingface.co/models?library=gguf):** Find a model, then click **Use this model -> Ollama** to get the command.
 2. **Open the Downloader:**
 In the WebUI, click the **model selector** (top of chat)  **"Pull a model from Ollama.com"**.
 3. **Enter Tag & Pull:**
 Paste the tag or command into the box and click the download button.
-> **Examples:**
+
+**Examples:**
 > * **Ollama Tag:** `CognitiveComputations/dolphin-llama3.1:8b`
 > * **Hugging Face Command:** `ollama run hf.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M`
 
@@ -119,26 +106,16 @@ The system includes built-in RAG (Retrieval-Augmented Generation) using ChromaDB
 
 ```bash
 terraform init
-
 ```
 
 ### 2. Launch
 
-Select your mode and run the corresponding command. Type `yes` when prompted.
-
-**Option A: CPU Mode (Test)**
-
 ```bash
-terraform apply -var="lab_mode=cpu"
+# CPU (no quota needed, good for testing)
+terraform apply -var="instance_size=cpu"
 
-```
-
-**Option B: GPU Mode (Power)**
-
-```bash
-# Select one size: small | medium | large | xlarge
-terraform apply -var="lab_mode=gpu" -var="gpu_size=small"
-
+# GPU - Select one size: gpu_small, gpu_medium, gpu_large, gpu_xlarge
+terraform apply -var="instance_size=gpu_small"
 ```
 
 ### 3. Connect via SSH Tunnel
@@ -147,12 +124,11 @@ Run the connection script to establish the secure tunnel and monitor installatio
 
 ```bash
 ./connect.sh
-
 ```
 
-* **Wait for "SETUP COMPLETE".**
-* **Keep this terminal open.** The tunnel is active only while this session is running.
-* Ignore "Connection refused" errors during the boot process.
+- Wait for "SETUP COMPLETE".
+- Keep this terminal open. The tunnel is active only while this session is running.
+- Ignore "Connection refused" errors during the boot process.
 
 ### 4. Access The Lab
 
@@ -169,14 +145,8 @@ You can now pull models and upload documents as described in the **Models & RAG*
 **Crucial:** When finished, destroy resources to stop costs. This deletes all data.
 
 1. Type `exit` in the `connect.sh` terminal.
-2. Run the destroy command matching your launch mode:
+2. Run destroy with the same size you launched:
 
 ```bash
-# CPU
-terraform destroy -var="lab_mode=cpu"
-
-# GPU (example)
-terraform destroy -var="lab_mode=gpu" -var="gpu_size=small"
-# Or whatever size you launched
-
+terraform destroy -var="instance_size=gpu_small"
 ```
