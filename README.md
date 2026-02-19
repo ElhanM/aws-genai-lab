@@ -99,14 +99,6 @@ The system includes built-in RAG (Retrieval-Augmented Generation) using ChromaDB
 
 ## Usage
 
-### Configure
-
-Copy the template and edit your credentials and instance size:
-
-```bash
-cp terraform.tfvars.example terraform.tfvars
-```
-
 ### Initialize
 
 ```bash
