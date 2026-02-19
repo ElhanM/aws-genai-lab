@@ -61,11 +61,10 @@ New AWS accounts have a default quota of **0 vCPUs** for GPU instances. You must
 3. Search for **"Running On-Demand G and VT instances"**.
 4. Click **Request increase at account level**.
 5. **Select Quota:**
-* **Small (1 GPU):** Request **4 vCPUs**
-* **Medium (4 GPUs):** Request **48 vCPUs**
-* **Large (4 GPUs, High CPU):** Request **96 vCPUs**
-* **XLarge (8 GPUs):** Request **192 vCPUs**
-
+    * **Small (1 GPU):** Request **4 vCPUs**
+    * **Medium (4 GPUs):** Request **48 vCPUs**
+    * **Large (4 GPUs, High CPU):** Request **96 vCPUs**
+    * **XLarge (8 GPUs):** Request **192 vCPUs**
 6. If prompted for justification, use:
 > "I am requesting a quota increase to run self-hosted LLMs for personal research. I plan to spin up these instances on-demand to interact with open-source models from Hugging Face. The larger GPU configurations allow me to experiment with a wide range of model sizes. Self-hosting on AWS also ensures I can use AI without third-party providers collecting my data. I am using Terraform to manage these resources efficiently and will destroy them when not in use. This is strictly for personal education and testing; there is no production or business traffic."
 
