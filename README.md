@@ -12,9 +12,9 @@ To create a **"dispose-on-demand"** AI lab. We use Terraform to automate the cre
 * **Secure Tunnel:** All access is routed through an encrypted SSH tunnel.
 * **Private:** Open WebUI runs in single-user mode (no auth required) because you are the only user with access to the tunnel.
 
-## Step 1: AWS Account Setup
+## AWS Account Setup
 
-### 1.1 Create an IAM User
+### Create an IAM User
 
 **Important:** Do NOT use root user access keys.
 
@@ -25,7 +25,7 @@ To create a **"dispose-on-demand"** AI lab. We use Terraform to automate the cre
 5. Search and check: **AdministratorAccess**.
 6. Click **Next** -> **Create user**.
 
-### 1.2 Create Access Keys
+### Create Access Keys
 
 1. Click your new user (`terraform-deployer`).
 2. Go to **Security credentials** -> **Access keys** -> **Create access key**.
@@ -34,25 +34,17 @@ To create a **"dispose-on-demand"** AI lab. We use Terraform to automate the cre
 5. Click **Create access key**.
 6. **Download the CSV** or copy the **Access Key ID** and **Secret Access Key**.
 
-### 1.3 Configure Credentials
+### Configure Credentials
 
-Create a file named `terraform.tfvars` in the project root:
+Copy the example template and fill in your values:
 
 ```bash
-cat > terraform.tfvars << 'EOF'
-# --- Required: AWS Credentials ---
-aws_access_key_id     = "AKIA..."         # Your IAM user's Access Key ID
-aws_secret_access_key = "your-secret..."  # Your IAM user's Secret Access Key
-
-# --- Optional: Deployment Settings ---
-aws_region    = "us-east-1"  # AWS region (default: us-east-1)
-instance_size = "gpu_small"  # Instance size: cpu / gpu_small / gpu_medium / gpu_large / gpu_xlarge
-EOF
+cp terraform.tfvars.example terraform.tfvars
 ```
 
-*Note: `terraform.tfvars` is ignored by Git to prevent accidental commits.*
+Then open `terraform.tfvars` and replace the placeholder values with your credentials and desired settings.
 
-### 1.4 Request GPU Quota (Required for GPU Mode)
+### Request GPU Quota (Required for GPU Mode)
 
 New AWS accounts have a default quota of **0 vCPUs** for GPU instances. You must request an increase before using GPU mode.
 
@@ -107,23 +99,27 @@ The system includes built-in RAG (Retrieval-Augmented Generation) using ChromaDB
 
 ## Usage
 
-### 1. Configure
+### Configure
 
-Edit `terraform.tfvars` and set your credentials and desired `instance_size`.
+Copy the template and edit your credentials and instance size:
 
-### 2. Initialize
+```bash
+cp terraform.tfvars.example terraform.tfvars
+```
+
+### Initialize
 
 ```bash
 terraform init
 ```
 
-### 3. Launch
+### Launch
 
 ```bash
 terraform apply -auto-approve
 ```
 
-### 4. Connect via SSH Tunnel
+### Connect via SSH Tunnel
 
 Run the connection script to establish the secure tunnel and monitor installation.
 
@@ -135,7 +131,7 @@ Run the connection script to establish the secure tunnel and monitor installatio
 - Keep this terminal open. The tunnel is active only while this session is running.
 - Ignore "Connection refused" errors during the boot process.
 
-### 5. Access The Lab
+### Access The Lab
 
 Open your browser to:
 
@@ -145,7 +141,7 @@ http://localhost:8080
 
 You can now pull models and upload documents as described in the **Models & RAG** section above.
 
-### 6. Tear Down (Stop Billing)
+### Tear Down (Stop Billing)
 
 **Crucial:** When finished, destroy resources to stop costs. This deletes all data.
 

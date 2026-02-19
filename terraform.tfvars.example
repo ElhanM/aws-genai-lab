@@ -1,0 +1,7 @@
+# --- Required: AWS Credentials ---
+aws_access_key_id     = "AKIA..."         # Your IAM user's Access Key ID
+aws_secret_access_key = "your-secret..."  # Your IAM user's Secret Access Key
+
+# --- Optional: Deployment Settings ---
+aws_region    = "us-east-1"  # AWS region (default: us-east-1)
+instance_size = "gpu_small"  # Instance size: cpu / gpu_small / gpu_medium / gpu_large / gpu_xlarge

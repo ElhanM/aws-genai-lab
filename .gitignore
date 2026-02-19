@@ -13,6 +13,8 @@ crash.*.log
 # such as password, private keys, and AWS keys.
 *.tfvars
 *.tfvars.json
+# Don't ignore template .tfvars file
+!terraform.tfvars.example
 
 # Ignore override files as they are usually local configurations
 override.tf
