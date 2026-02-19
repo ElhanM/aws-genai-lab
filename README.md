@@ -36,14 +36,18 @@ To create a **"dispose-on-demand"** AI lab. We use Terraform to automate the cre
 
 ### 1.3 Configure Credentials
 
-Create a file named `terraform.tfvars` in the project root.
+Create a file named `terraform.tfvars` in the project root:
 
 ```bash
 cat > terraform.tfvars << 'EOF'
-aws_access_key_id     = "AKIA..."  # Replace with your Access Key ID
-aws_secret_access_key = "your-secret-access-key-here"
-EOF
+# --- Required: AWS Credentials ---
+aws_access_key_id     = "AKIA..."         # Your IAM user's Access Key ID
+aws_secret_access_key = "your-secret..."  # Your IAM user's Secret Access Key
 
+# --- Optional: Deployment Settings ---
+aws_region    = "us-east-1"  # AWS region (default: us-east-1)
+instance_size = "gpu_small"  # Instance size: cpu / gpu_small / gpu_medium / gpu_large / gpu_xlarge
+EOF
 ```
 
 *Note: `terraform.tfvars` is ignored by Git to prevent accidental commits.*
@@ -75,6 +79,8 @@ New AWS accounts have a default quota of **0 vCPUs** for GPU instances. You must
 | `gpu_large`  | `g5.24xlarge` | 4    | 96GB  | 96         | ~$8.14    | 70B Q8               |
 | `gpu_xlarge` | `g5.48xlarge` | 8    | 192GB | 192        | ~$16.29   | 120B Q8              |
 
+Set `instance_size` in your `terraform.tfvars` before applying.
+
 ## Models & RAG Capabilities
 
 Once the lab is running, you interact with it via **Open WebUI**.
@@ -85,7 +91,7 @@ Once the lab is running, you interact with it via **Open WebUI**.
     * **[Ollama Library](https://ollama.com/library):** Search for a model tag (e.g., `CognitiveComputations/dolphin-llama3.1:8b`).
     * **[Hugging Face GGUF](https://huggingface.co/models?library=gguf):** Find a model, then click **Use this model -> Ollama** to get the command.
 2. **Open the Downloader:**
-In the WebUI, click the **model selector** (top of chat)  **"Pull a model from Ollama.com"**.
+In the WebUI, click the **model selector** (top of chat) -> **"Pull a model from Ollama.com"**.
 3. **Enter Tag & Pull:**
 Paste the tag or command into the box and click the download button.
 
@@ -102,23 +108,23 @@ The system includes built-in RAG (Retrieval-Augmented Generation) using ChromaDB
 
 ## Usage
 
-### 1. Initialize
+### 1. Configure
+
+Edit `terraform.tfvars` and set your credentials and desired `instance_size`.
+
+### 2. Initialize
 
 ```bash
 terraform init
 ```
 
-### 2. Launch
+### 3. Launch
 
 ```bash
-# CPU (no quota needed, good for testing)
-terraform apply -var="instance_size=cpu"
-
-# GPU - Select one size: gpu_small, gpu_medium, gpu_large, gpu_xlarge
-terraform apply -var="instance_size=gpu_small"
+terraform apply -auto-approve
 ```
 
-### 3. Connect via SSH Tunnel
+### 4. Connect via SSH Tunnel
 
 Run the connection script to establish the secure tunnel and monitor installation.
 
@@ -130,7 +136,7 @@ Run the connection script to establish the secure tunnel and monitor installatio
 - Keep this terminal open. The tunnel is active only while this session is running.
 - Ignore "Connection refused" errors during the boot process.
 
-### 4. Access The Lab
+### 5. Access The Lab
 
 Open your browser to:
 
@@ -140,13 +146,13 @@ http://localhost:8080
 
 You can now pull models and upload documents as described in the **Models & RAG** section above.
 
-### 5. Tear Down (Stop Billing)
+### 6. Tear Down (Stop Billing)
 
 **Crucial:** When finished, destroy resources to stop costs. This deletes all data.
 
 1. Type `exit` in the `connect.sh` terminal.
-2. Run destroy with the same size you launched:
+2. Run:
 
 ```bash
-terraform destroy -var="instance_size=gpu_small"
+terraform destroy -auto-approve
 ```

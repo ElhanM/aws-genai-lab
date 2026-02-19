@@ -1,27 +1,17 @@
 #!/bin/bash
 set -e
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-MAGENTA='\033[0;35m'
-BOLD='\033[1m'
-NC='\033[0m' # No Color
-
 # Get the IP from terraform output
 IP=$(terraform output -raw instance_ip 2>/dev/null)
 
 if [ -z "$IP" ]; then
-    echo -e "${RED}Error: Could not get instance IP. Did you run 'terraform apply'?${NC}"
+    echo "Error: Could not get instance IP. Did you run 'terraform apply'?"
     exit 1
 fi
 
 echo ""
-echo -e "${BLUE}${BOLD}AWS GenAI Lab - Setup Progress Monitor${NC}"
-echo -e "${YELLOW}Instance IP: ${IP}${NC}"
+echo "AWS GenAI Lab - Setup Progress Monitor"
+echo "Instance IP: ${IP}"
 echo ""
 
 # Fix permissions on the key
@@ -50,23 +40,23 @@ check_webui() {
 # Function to show connection instructions and start tunnel
 start_tunnel() {
     echo ""
-    echo -e "${GREEN}${BOLD}==========================================================${NC}"
-    echo -e "${MAGENTA}${BOLD}                      ALL READY!${NC}"
-    echo -e "${GREEN}${BOLD}==========================================================${NC}"
+    echo "=========================================================="
+    echo "                      ALL READY!"
+    echo "=========================================================="
     echo ""
-    echo -e "${CYAN}Starting secure SSH tunnel...${NC}"
+    echo "Starting secure SSH tunnel..."
     echo ""
-    echo -e "${GREEN}${BOLD}Open your browser to: http://localhost:8080${NC}"
+    echo "Open your browser to: http://localhost:8080"
     echo ""
-    echo -e "${YELLOW}Next steps:${NC}"
-    echo -e "${YELLOW}  1. Open http://localhost:8080 in your browser${NC}"
-    echo -e "${YELLOW}  2. Click model selector -> Pull a model${NC}"
-    echo -e "${YELLOW}  3. Find models: ollama.com/library or huggingface.co${NC}"
+    echo "Next steps:"
+    echo "  1. Open http://localhost:8080 in your browser"
+    echo "  2. Click model selector -> Pull a model"
+    echo "  3. Find models: ollama.com/library or huggingface.co"
     echo ""
-    echo -e "${CYAN}SSH Tunnel Active & Interactive Shell Ready${NC}"
-    echo -e "${YELLOW}  - You can run commands on the EC2 instance (e.g., 'docker ps', 'ollama list')${NC}"
-    echo -e "${YELLOW}  - To disconnect: type 'exit' and press Enter${NC}"
-    echo -e "${YELLOW}  - To reconnect: run './connect.sh' again${NC}"
+    echo "SSH Tunnel Active & Interactive Shell Ready"
+    echo "  - You can run commands on the EC2 instance (e.g., 'docker ps', 'ollama list')"
+    echo "  - To disconnect: type 'exit' and press Enter"
+    echo "  - To reconnect: run './connect.sh' again"
     echo ""
 
     # Start SSH tunnel with port forwarding and interactive shell
@@ -80,11 +70,12 @@ start_tunnel() {
         -L 9099:localhost:9099 \
         ubuntu@${IP} || true
 
-    echo -e "\n${GREEN}SSH tunnel closed successfully${NC}"
+    echo ""
+    echo "SSH tunnel closed successfully"
 }
 
 # Wait for SSH to be available
-echo -e "${YELLOW}Step 1/2: Waiting for instance to boot...${NC}"
+echo "Step 1/2: Waiting for instance to boot..."
 COUNTER=0
 MAX_WAIT=60
 while ! check_ssh; do
@@ -92,23 +83,25 @@ while ! check_ssh; do
     sleep 2
     COUNTER=$((COUNTER + 1))
     if [ $COUNTER -gt $MAX_WAIT ]; then
-        echo -e "\n${RED}Error: SSH connection timeout${NC}"
+        echo ""
+        echo "Error: SSH connection timeout"
         exit 1
     fi
 done
-echo -e "\n${GREEN}SSH is ready!${NC}"
+echo ""
+echo "SSH is ready!"
 echo ""
 
 # Check if setup is already complete
 if check_ready && check_webui; then
-    echo -e "${GREEN}${BOLD}Instance is fully configured and ready!${NC}"
+    echo "Instance is fully configured and ready!"
     start_tunnel
     exit 0
 fi
 
 # Show setup progress
-echo -e "${YELLOW}Step 2/2: Installing Ollama and Open WebUI...${NC}"
-echo -e "${BLUE}This will take 2-3 minutes.${NC}"
+echo "Step 2/2: Installing Ollama and Open WebUI..."
+echo "This will take 2-3 minutes."
 echo ""
 
 # Monitor progress with live updates
@@ -148,6 +141,7 @@ ssh $SSH_OPTS ubuntu@${IP} 'bash -s' << 'ENDSSH'
         if [ -f /var/log/user-data.log ]; then
             echo "  Recent activity:"
             tail -5 /var/log/user-data.log | sed 's/^/    /'
+            echo ""
         fi
         echo "-----------------------------------------------------------"
     }
