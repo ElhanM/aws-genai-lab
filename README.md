@@ -62,13 +62,13 @@ New AWS accounts have a default quota of **0 vCPUs** for GPU instances. You must
 
 ## Hardware Selection
 
-| Size Flag    | Instance      | GPUs | VRAM  | vCPU Quota | Cost/Hour | Target Model Size    |
-| ------------ | ------------- | ---- | ----- | ---------- | --------- | -------------------- |
-| `cpu`        | `t3.xlarge`   | -    | -     | None       | ~$0.17    | Testing, models <=7B |
-| `gpu_small`  | `g5.xlarge`   | 1    | 24GB  | 4          | ~$1.01    | 7B-13B Q8            |
-| `gpu_medium` | `g5.12xlarge` | 4    | 96GB  | 48         | ~$5.67    | 30B-34B Q8           |
-| `gpu_large`  | `g5.24xlarge` | 4    | 96GB  | 96         | ~$8.14    | 70B Q8               |
-| `gpu_xlarge` | `g5.48xlarge` | 8    | 192GB | 192        | ~$16.29   | 120B Q8              |
+| Size Flag    | Instance      | CPU Cores | RAM     | GPUs | VRAM  | vCPU Quota | Cost/Hour | Target Model Size    |
+| ------------ | ------------- | --------- | ------- | ---- | ----- | ---------- | --------- | -------------------- |
+| `cpu`        | `t3.xlarge`   | 4         | 16 GiB  | -    | -     | None       | ~$0.17    | Testing, models <=7B |
+| `gpu_small`  | `g5.xlarge`   | 4         | 16 GiB  | 1    | 24GB  | 4          | ~$1.01    | 7B-13B Q8            |
+| `gpu_medium` | `g5.12xlarge` | 48        | 192 GiB | 4    | 96GB  | 48         | ~$5.67    | 30B-34B Q8           |
+| `gpu_large`  | `g5.24xlarge` | 96        | 384 GiB | 4    | 96GB  | 96         | ~$8.14    | 70B Q8               |
+| `gpu_xlarge` | `g5.48xlarge` | 192       | 768 GiB | 8    | 192GB | 192        | ~$16.29   | 120B Q8              |
 
 Set `instance_size` in your `terraform.tfvars` before applying.
 
