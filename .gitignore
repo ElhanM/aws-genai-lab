@@ -41,6 +41,9 @@ __pycache__/
 *$py.class
 
 # Benchmark outputs (contain raw AI model responses - do not push)
-benchmarks/results/
+benchmarks/results/*
 benchmarks/logs/
 benchmarks/.env
+
+# Except for the research analysis file (redacted answers only)
+!benchmarks/results/analysis_output.md

@@ -21,7 +21,7 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-# Edit .env with your GitHub token
+# Edit .env with your API key and EC2 connection details
 ```
 
 ## Usage
@@ -59,30 +59,65 @@ After benchmarking, run:
 python -m run_analysis
 ```
 
-This reads all CSV files in `results/`, prints per-prompt detail with
-judge reasoning, then summary tables ranked by overall score.
-Summaries are exported to `results/summaries/`.
+This reads all CSV files in `results/` and generates **both** output files
+in a single run:
 
-To hide model responses (show only scores and judge reasoning):
+- `results/analysis_output.md` — redacted (answers hidden), version-controlled
+- `results/analysis_output_full.md` — full with answers, gitignored
 
-```bash
-python -m run_analysis --hide-answers
-```
+Both files contain per-prompt detail with judge reasoning and summary
+tables ranked by overall score. Summaries are also exported as CSVs to
+`results/summaries/`.
 
 ### View Individual Results
 
-To read a model's results in a human-readable format:
+To generate a full Markdown report (with AI responses) for a single model:
 
 ```bash
-python -m view_results results/<filename>.csv
+python -m run_analysis --single results/<filename>.csv
+```
+
+This creates `results/<filename>_view.md` with the complete per-prompt
+detail including responses, scores, and judge reasoning. The output file
+is gitignored.
+
+### Patch a Single Failed Result
+
+If a prompt failed (e.g. due to a timeout), re-run just that prompt and
+update the existing CSV in-place:
+
+```bash
+python -m patch_result <model_tag> <prompt_id>
+```
+
+The model tag is the same format used in `config/models.yaml`. The script will:
+- Derive the CSV path automatically from the model tag
+- Pull the model if it is not already loaded
+- Re-run the single prompt
+- Judge the response
+- Overwrite only that row in the CSV, leaving all other results intact
+
+**Example:**
+
+```bash
+python -m patch_result "WhiteRabbitNeo/Llama-3.1-WhiteRabbitNeo-2-70B" exploit-01
+```
+
+After patching, re-run the analysis to update the summary tables:
+
+```bash
+python -m run_analysis
 ```
 
 ## Output Structure
 
 ```
 results/
-  CognitiveComputations_dolphin-llama3.1_8b.csv               # One CSV per model
-  TheBloke_Mistral-7B-Instruct-v0.2-GGUF_Q4_K_M.csv
+  CognitiveComputations_dolphin-llama3.1_8b.csv               # One CSV per model (gitignored)
+  TheBloke_Mistral-7B-Instruct-v0.2-GGUF_Q4_K_M.csv          # One CSV per model (gitignored)
+  TheBloke_Mistral-7B-Instruct-v0.2-GGUF_Q4_K_M_view.md      # Single-model viewer (gitignored)
+  analysis_output.md                                           # Redacted analysis - version controlled
+  analysis_output_full.md                                      # Full analysis with answers - gitignored
   summaries/
     summary_overall.csv                                        # Aggregated rankings
     summary_by_difficulty.csv

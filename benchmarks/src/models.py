@@ -9,7 +9,9 @@ Supports both Ollama Library tags and HuggingFace GGUF tags:
     - Ollama Lib:  "CognitiveComputations/dolphin-llama3.1:8b"
 """
 
+import json
 import os
+import subprocess
 import time
 import requests
 
@@ -53,10 +55,25 @@ class OllamaClient:
         try:
             r = requests.post(
                 f"{self.base_url}/api/pull",
-                json={"name": tag, "stream": False},
+                json={"name": tag, "stream": True},
                 timeout=timeout,
+                stream=True,
             )
             r.raise_for_status()
+
+            # Consume the streaming response until pull completes
+            for line in r.iter_lines():
+                if line:
+                    try:
+                        status = json.loads(line)
+                        if "error" in status:
+                            log.error("Pull error for %s: %s", tag, status["error"])
+                            return False
+                        if status.get("status") == "success":
+                            break
+                    except (ValueError, KeyError):
+                        pass
+
             log.info("Model pulled successfully: %s", tag)
             return True
         except requests.RequestException as exc:
@@ -149,7 +166,7 @@ class OllamaClient:
     # Inference
     # ------------------------------------------------------------------
     def generate(self, model_tag, prompt, temperature=0.7, max_tokens=4096,
-                 timeout=1200):
+                 timeout=600):
         """Send a prompt to a model and return the response text.
 
         The model_tag is normalized before use. Works with both Ollama

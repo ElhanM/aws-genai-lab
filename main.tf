@@ -138,7 +138,7 @@ resource "aws_instance" "lab_instance" {
   subnet_id = length(data.aws_subnets.default.ids) > 0 ? data.aws_subnets.default.ids[0] : aws_subnet.default_subnet[0].id
 
   root_block_device {
-    volume_size = 100
+    volume_size = 150
     volume_type = "gp3"
   }
 
@@ -159,6 +159,19 @@ resource "aws_instance" "lab_instance" {
               
               # Install Ollama
               curl -fsSL https://ollama.com/install.sh | sh
+              
+              # Move Ollama storage to NVMe ephemeral disk if available
+              # GPU instances (g5.*) have fast local NVMe with TBs of space
+              # which is much larger than the EBS root volume
+              NVME_PATH="/opt/dlami/nvme"
+              if [ -d "$NVME_PATH" ]; then
+                echo "NVMe storage detected at $NVME_PATH — moving Ollama models there"
+                mkdir -p "$NVME_PATH/ollama"
+                chown ollama:ollama "$NVME_PATH/ollama"
+                mkdir -p /usr/share/ollama/.ollama
+                ln -sfn "$NVME_PATH/ollama" /usr/share/ollama/.ollama/models
+                chown -h ollama:ollama /usr/share/ollama/.ollama/models
+              fi
               
               # Enable and start Ollama service
               systemctl enable ollama
