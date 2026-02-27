@@ -3,9 +3,6 @@
 Orchestrates the full pipeline:
   1. Load models and prompts from config.
   2. For each model: pull, run all prompts, judge each response, save CSV, delete.
-
-For activation-steered models (tag starts with 'repe::'), the runner
-connects to a separate inference server and skips pull/delete operations.
 """
 
 import csv
@@ -23,11 +20,6 @@ from src.utils import (
 )
 
 log = setup_logging("runner", "runner.log")
-
-
-def _is_repe_model(tag):
-    """Check if a model tag refers to an activation-steered model."""
-    return tag.startswith("repe::")
 
 
 def run_benchmark():
@@ -48,14 +40,13 @@ def run_benchmark():
     # Default client for standard Ollama models
     default_client = OllamaClient()
 
-    if not any(_is_repe_model(m["tag"]) for m in models):
-        if not default_client.is_available():
-            log.error(
-                "Ollama is not reachable at %s. "
-                "Make sure the AI lab is running and the SSH tunnel is active.",
-                default_client.base_url,
-            )
-            return
+    if not default_client.is_available():
+        log.error(
+            "Ollama is not reachable at %s. "
+            "Make sure the AI lab is running and the SSH tunnel is active.",
+            default_client.base_url,
+        )
+        return
 
     judge = create_judge()
     results_dir = get_results_dir()
@@ -69,7 +60,6 @@ def run_benchmark():
     for model_entry in models:
         tag = normalize_model_tag(model_entry["tag"])
         category = model_entry.get("category", "unknown")
-        is_repe = _is_repe_model(tag)
 
         # Determine which client to use
         custom_url = model_entry.get("ollama_base_url")
@@ -80,18 +70,11 @@ def run_benchmark():
 
         # Verify connectivity
         if not client.is_available():
-            if is_repe:
-                log.error(
-                    "RepE server not reachable at %s for model %s. "
-                    "Start the RepE server first.",
-                    client.base_url, tag,
-                )
-            else:
-                log.error(
-                    "Ollama is not reachable at %s for model %s. "
-                    "Make sure the AI lab is running and the SSH tunnel is active.",
-                    client.base_url, tag,
-                )
+            log.error(
+                "Ollama is not reachable at %s for model %s. "
+                "Make sure the AI lab is running and the SSH tunnel is active.",
+                client.base_url, tag,
+            )
             continue
 
         safe_name = sanitize_model_name(tag)
@@ -103,21 +86,18 @@ def run_benchmark():
 
         log.info("=" * 60)
         log.info("MODEL: %s (%s)", tag, category)
-        if is_repe:
-            log.info("  (activation-steered via RepE server at %s)", client.base_url)
         log.info("=" * 60)
 
-        # Pull model (skip for RepE models)
-        if not is_repe:
-            if not client.pull_model(tag):
-                log.error("Skipping %s -- pull failed", tag)
-                continue
-            time.sleep(3)
+        # Pull model
+        if not client.pull_model(tag):
+            log.error("Skipping %s -- pull failed", tag)
+            continue
+        time.sleep(3)
 
-            # Warmup: send a short prompt to force model loading into VRAM
-            log.info("Warming up model...")
-            client.generate(tag, "Hello", max_tokens=1)
-            log.info("Model warm-up complete.")
+        # Warmup: send a short prompt to force model loading into VRAM
+        log.info("Warming up model...")
+        client.generate(tag, "Hello", max_tokens=1)
+        log.info("Model warm-up complete.")
 
         # Prepare CSV
         fieldnames = [
@@ -207,9 +187,8 @@ def run_benchmark():
 
         log.info("Results saved to %s", csv_path)
 
-        # Delete benchmark model (skip for RepE)
-        if not is_repe:
-            client.delete_model(tag)
-            time.sleep(2)
+        # Delete benchmark model
+        client.delete_model(tag)
+        time.sleep(2)
 
     log.info("Benchmark run complete.")

@@ -3,6 +3,3 @@ google-genai>=1.0
 pandas>=2.0
 python-dotenv>=1.0
 requests>=2.31
-torch>=2.0
-transformers>=4.40
-numpy>=1.24

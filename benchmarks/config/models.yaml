@@ -7,12 +7,7 @@
 #
 # Do NOT include the "ollama run" prefix -- just the tag/path.
 #
-# For activation-steered (un-aligned) models served by repe_server.py,
-# use the "repe::" prefix and set ollama_base_url to the server port.
-# RepE only works with HuggingFace models (not Ollama) because it needs
-# direct access to internal model layers.
-#
-# Category is for labelling in results (e.g. "base", "cybersec", "unaligned").
+# Category is for labelling in results (e.g. "base", "cybersec").
 
 # =======================================================================
 # gpu_small (g5.xlarge) - 1 GPU, 24GB VRAM - models 7B-13B
@@ -62,11 +57,3 @@ models:
   - tag: "hf.co/Trendyol/Trendyol-Cybersecurity-LLM-v2-70B-Q4_K_M:Q4_K_M"
     category: "cybersec"
     description: "Trendyol Cybersecurity LLM v2 70B Q4_K_M - cybersecurity-specialised 70B from Trendyol"
-
-  # Un-aligned models (start repe_server.py first, then uncomment):
-  # RepE requires loading the model via HuggingFace transformers, not Ollama.
-  # The HuggingFace model ID below must match what you pass to repe_server.py.
-  # - tag: "repe::meta-llama/Llama-3.1-8B-Instruct"
-  #   category: "unaligned"
-  #   description: "Llama 3.1 8B with refusal direction ablated via RepE"
-  #   ollama_base_url: "http://localhost:11435"

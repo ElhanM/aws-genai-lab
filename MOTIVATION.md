@@ -10,17 +10,13 @@ Even open-source models - including those explicitly fine-tuned for cybersecurit
 
 ## What This Project Does
 
-This project provides a complete engineering and research solution across five areas:
+This project provides a complete engineering and research solution across three areas:
 
 1. **Secure, Affordable Infrastructure** - An automated, dispose-on-demand cloud laboratory on AWS that allows professionals to securely and affordably host open-source AI. Servers are created when needed and destroyed when finished - you only pay for what you use, and all data is wiped on shutdown.
 
 2. **Automated Benchmarking** - A benchmarking suite that programmatically evaluates open-source models (including standard and cybersecurity-specialised models) across a gradient of cybersecurity tasks. Prompts deliberately range from indirect, contextual assistance to explicit offensive commands designed to trigger refusal mechanisms. An automated judge scores every response for refusal behaviour, technical accuracy, practical utility, and completeness.
 
-3. **Mechanistic Un-Alignment** - Representation Engineering (RepE) techniques - specifically activation steering and vector ablation - are applied to the top-performing base model. This method mathematically maps the internal neural activations that trigger when a model decides to refuse a prompt (the "refusal direction") and subtracts them in real-time during inference. The goal is to silence residual safety guardrails without modifying model weights, using minimal compute.
-
-4. **Comparative Analysis** - A second round of benchmarking compares base models against un-aligned models. The same automated judge evaluates both for accuracy, utility, and refusal rates to determine whether activation steering successfully improved performance on difficult tasks.
-
-5. **Practical Validation** - The winning model is deployed in a private web interface within the cloud lab and used for authorised red teaming case studies, demonstrating real-world usefulness in an isolated environment.
+3. **Practical Validation** - The winning model is deployed in a private web interface within the cloud lab and used for authorised red teaming case studies, demonstrating real-world usefulness in an isolated environment.
 
 ## Ethical Consideration
 

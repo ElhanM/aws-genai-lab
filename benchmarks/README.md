@@ -77,80 +77,12 @@ To read a model's results in a human-readable format:
 python -m view_results results/<filename>.csv
 ```
 
-## Benchmarking Un-aligned Models (Representation Engineering)
-
-Activation steering modifies the model's hidden states at inference time.
-It does not produce a new model file. It only works with HuggingFace
-models loaded via `transformers` -- Ollama models cannot be steered this
-way because Ollama does not expose internal layer activations.
-
-The AI lab must be running.
-
-### 1. Start the RepE inference server on the EC2 instance
-
-SSH into the instance (via the `connect.sh` shell) and run:
-
-```bash
-cd benchmarks
-source venv/bin/activate
-python -m src.repe_server \
-    --model "meta-llama/Llama-3.1-8B-Instruct" \
-    --port 11435 \
-    --strength 1.5 \
-    --save-direction /tmp/refusal_dir.npy
-```
-
-This will:
-  - Load the base model from HuggingFace
-  - Compute the refusal direction from contrast pairs (or load from file)
-  - Register a forward hook that subtracts the refusal direction at inference time
-  - Serve an Ollama-compatible API on port 11435
-
-Options:
-  - `--layer N` : which transformer layer to steer (default: middle layer)
-  - `--strength F` : how aggressively to subtract the refusal direction (default: 1.5)
-  - `--direction-file path.npy` : load a pre-computed direction instead of recomputing
-  - `--save-direction path.npy` : save the computed direction for reuse
-
-> **Note:** Gated models (like Meta Llama) are not supported. If you try to
-> load a gated model, the server will exit with an error telling you to use
-> a non-gated model instead.
-
-### 2. Uncomment the un-aligned model in models.yaml
-
-Comment out the base models (they should already have CSVs in `results/`)
-and uncomment the un-aligned entry:
-
-```yaml
-  - tag: "repe::meta-llama/Llama-3.1-8B-Instruct"
-    category: "unaligned"
-    description: "Llama 3.1 8B with refusal direction ablated via RepE"
-    ollama_base_url: "http://localhost:11435"
-```
-
-### 3. Run the benchmark
-
-```bash
-python -m run_benchmark
-```
-
-### 4. Compare results
-
-```bash
-python -m run_analysis
-```
-
-The analysis script reads all CSVs in `results/`, so base and un-aligned
-model results appear side by side automatically. The `model_category`
-column distinguishes "base" from "unaligned" entries.
-
 ## Output Structure
 
 ```
 results/
   CognitiveComputations_dolphin-llama3.1_8b.csv               # One CSV per model
   TheBloke_Mistral-7B-Instruct-v0.2-GGUF_Q4_K_M.csv
-  repe__meta-llama_Llama-3.1-8B-Instruct.csv
   summaries/
     summary_overall.csv                                        # Aggregated rankings
     summary_by_difficulty.csv
