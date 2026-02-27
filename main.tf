@@ -151,6 +151,10 @@ resource "aws_instance" "lab_instance" {
               exec > >(tee /var/log/user-data.log)
               exec 2>&1
               
+              echo "=== Installing Dependencies ==="
+              apt-get update
+              apt-get install -y zstd docker.io
+              
               echo "=== Starting Ollama Installation ==="
               
               # Install Ollama
@@ -180,10 +184,8 @@ resource "aws_instance" "lab_instance" {
                 sleep 2
               done
               
-              # Install Docker for Open WebUI
-              echo "=== Installing Docker ==="
-              apt-get update
-              apt-get install -y docker.io
+              # Docker is already installed above, just enable it
+              echo "=== Configuring Docker ==="
               systemctl enable docker
               systemctl start docker
               
