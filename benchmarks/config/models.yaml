@@ -22,46 +22,46 @@ models:
   #   category: "cybersec"
   #   description: "Dolphin Llama 3.1 8B - uncensored fine-tune"
 
-  # - tag: "hf.co/failspy/Phi-3-medium-128k-instruct-abliterated-v3-GGUF:Q4_K_M"
+  # - tag: "hf.co/fdtn-ai/Foundation-Sec-1.1-8B-Instruct-Q4_K_M-GGUF:Q4_K_M"
   #   category: "cybersec"
-  #   description: "Phi-3 Medium 14B abliterated v3 Q4_K_M - safety refusals removed via abliteration"
+  #   description: "Foundation-Sec 1.1 8B Q4_K_M - cybersecurity-specialised 8B from fdtn.ai"
 
   # - tag: "sammcj/dolphin-2.9.3-qwen2.5-7b:q8_0"
   #   category: "cybersec"
   #   description: "Dolphin 2.9.3 Qwen2.5 7B Q8 - uncensored Qwen fine-tune"
 
-  # - tag: "hf.co/bartowski/Llama-3.1-WhiteRabbitNeo-2-8B-GGUF:Q8_0"
+  # - tag: "hf.co/mradermacher/ZySec-7B-GGUF:Q8_0"
   #   category: "cybersec"
-  #   description: "WhiteRabbitNeo 2 8B Q8 - cybersecurity-specialised Llama 3.1"
+  #   description: "ZySec 7B Q8 - cybersecurity-specialised 7B from mradermacher"
 
-  # - tag: "hf.co/bartowski/dolphin-2.9.4-gemma2-9b-GGUF:Q6_K_L"
+  # - tag: "hf.co/bartowski/dolphin-2.9.4-llama3.1-8b-GGUF:Q6_K_L"
   #   category: "cybersec"
-  #   description: "Dolphin 2.9.4 Gemma2 9B Q6_K_L - uncensored Gemma fine-tune"
+  #   description: "Dolphin 2.9.4 Llama 3.1 8B Q6_K_L - uncensored 8B, strongest Dolphin"
 
   # =======================================================================
   # gpu_medium (g5.12xlarge) - 4 GPUs, 96GB VRAM - models 30B-70B
   # Comment out the gpu_small models above and uncomment these.
   # Also switch judge.yaml to use the stronger local judge (see below).
   # =======================================================================
-  - tag: "hf.co/bartowski/dolphin-2.9-llama3-70b-GGUF:Q4_K_M"
-    category: "cybersec"
-    description: "Dolphin 2.9.4 Llama 3.1 70B Q4_K_M - uncensored 70B, strongest Dolphin"
+  # - tag: "hf.co/bartowski/dolphin-2.9-llama3-70b-GGUF:Q4_K_M"
+  #   category: "cybersec"
+  #   description: "Dolphin 2.9.4 Llama 3.1 70B Q4_K_M - uncensored 70B, strongest Dolphin"
 
   - tag: "hf.co/bartowski/Llama-3.1-WhiteRabbitNeo-2-70B-GGUF:Q4_K_M"
     category: "cybersec"
     description: "WhiteRabbitNeo 2 70B Q4_K_M - cybersecurity-specialised 70B"
 
-  - tag: "hf.co/bartowski/dolphin-2.9.4-gemma2-27b-GGUF:Q6_K_L"
+  - tag: "hf.co/bartowski/gemma-2-27b-it-GGUF:Q6_K_L"
     category: "cybersec"
-    description: "Dolphin 2.9.4 Gemma2 27B Q6_K_L - uncensored Gemma 27B"
+    description: "Gemma 2 27B Q6_K_L - uncensored Gemma 27B"
 
   - tag: "hf.co/bartowski/Qwen2.5-Coder-32B-Instruct-abliterated-GGUF:Q5_K_M"
     category: "cybersec"
     description: "Qwen2.5 Coder 32B abliterated Q5_K_M - code-focused with safety removed"
 
-  - tag: "hf.co/bartowski/airoboros-l2-70b-3.1.2-GGUF:Q4_K_M"
+  - tag: "hf.co/Trendyol/Trendyol-Cybersecurity-LLM-v2-70B-Q4_K_M:Q4_K_M"
     category: "cybersec"
-    description: "Airoboros L2 70B Q4_K_M - uncensored creative Llama 2 70B"
+    description: "Trendyol Cybersecurity LLM v2 70B Q4_K_M - cybersecurity-specialised 70B from Trendyol"
 
   # Un-aligned models (start repe_server.py first, then uncomment):
   # RepE requires loading the model via HuggingFace transformers, not Ollama.
