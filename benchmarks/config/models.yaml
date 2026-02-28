@@ -50,14 +50,14 @@ models:
     category: "cybersec"
     description: "Qwen2.5 Coder 32B abliterated Q5_K_M - code-focused with safety removed"
   
-  - tag: "hf.co/Trendyol/Trendyol-Cybersecurity-LLM-Qwen3-32B-Q8_0-GGUF:Q8_0"
-    category: "cybersec"
-    description: "32B Qwen3 trained on 200GB security data - Exploit Dev, Malware Analysis"
+  # - tag: "hf.co/Trendyol/Trendyol-Cybersecurity-LLM-Qwen3-32B-Q8_0-GGUF:Q8_0"
+  #   category: "cybersec"
+  #   description: "32B Qwen3 trained on 200GB security data - Exploit Dev, Malware Analysis"
 
   - tag: "hf.co/AlicanKiraz0/Seneca-Cybersecurity-LLM-x-QwQ-32B-Q8_Max-Version:Q8_0"
     category: "cybersec"
     description: "32B QwQ reasoning model for IR, Threat Hunting, Exploit Dev"
 
-  - tag: "hf.co/AlicanKiraz0/Seneca-Cybersecurity-LLM-x-DeepSeek-R1-Distill-Qwen-32B-v1.3-Safe-Q8_0-GGUF:Q8_0"
-    category: "cybersec"
-    description: "32B DeepSeek-R1 reasoning distilled into Qwen, fine-tuned for Purple Team, Exploits"
+  # - tag: "hf.co/AlicanKiraz0/Seneca-Cybersecurity-LLM-x-DeepSeek-R1-Distill-Qwen-32B-v1.3-Safe-Q8_0-GGUF:Q8_0"
+  #   category: "cybersec"
+  #   description: "32B DeepSeek-R1 reasoning distilled into Qwen, fine-tuned for Purple Team, Exploits"
