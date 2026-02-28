@@ -1,5 +1,3 @@
-import os
-import re
 import yaml
 import logging
 from pathlib import Path
@@ -94,7 +92,7 @@ def sanitize_model_name(tag):
 
     # Strip the hf.co/ prefix for cleaner filenames
     if name.startswith("hf.co/"):
-        name = name[len("hf.co/"):]
+        name = name[len("hf.co/") :]
 
     # Replace characters that are unsafe in filenames
     name = name.replace(":", "_").replace("/", "_")
@@ -116,5 +114,5 @@ def normalize_model_tag(tag):
     """
     cleaned = tag.strip()
     if cleaned.lower().startswith("ollama run "):
-        cleaned = cleaned[len("ollama run "):].strip()
+        cleaned = cleaned[len("ollama run ") :].strip()
     return cleaned

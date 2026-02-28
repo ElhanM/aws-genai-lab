@@ -47,6 +47,7 @@ DEFAULT_SCORE_VALUES = {
 # Missing-prompt backfill & Patch Generation
 # ---------------------------------------------------------------------------
 
+
 def backfill_missing_prompts(df):
     """Ensure every model has a row for every prompt defined in prompts.yaml.
 
@@ -85,7 +86,9 @@ def backfill_missing_prompts(df):
 
         log.info(
             "Model '%s' is missing %d prompt(s): %s - backfilling with zeros",
-            model_tag, len(missing_ids), sorted(missing_ids),
+            model_tag,
+            len(missing_ids),
+            sorted(missing_ids),
         )
 
         for pid in missing_ids:
@@ -121,7 +124,11 @@ def backfill_missing_prompts(df):
     prompt_order = [p["id"] for p in prompts]
     order_map = {pid: i for i, pid in enumerate(prompt_order)}
     combined["_sort_key"] = combined["prompt_id"].map(order_map).fillna(len(order_map))
-    combined = combined.sort_values(["model_tag", "_sort_key"]).drop(columns=["_sort_key"]).reset_index(drop=True)
+    combined = (
+        combined.sort_values(["model_tag", "_sort_key"])
+        .drop(columns=["_sort_key"])
+        .reset_index(drop=True)
+    )
 
     return combined
 
@@ -133,10 +140,10 @@ def generate_patch_commands(df):
 
     # Normal scores are 1-5. A score of 0 means a judge failure, missing prompt, or error.
     mask = (
-        (df["refusal"] == 0) | 
-        (df["accuracy"] == 0) | 
-        (df["utility"] == 0) | 
-        (df["completeness"] == 0)
+        (df["refusal"] == 0)
+        | (df["accuracy"] == 0)
+        | (df["utility"] == 0)
+        | (df["completeness"] == 0)
     )
     failed_df = df[mask]
 
@@ -144,27 +151,30 @@ def generate_patch_commands(df):
         return
 
     log.warning("Detected %d failed/missing prompts requiring patches.", len(failed_df))
-    
-    print("\n" + "="*80)
+
+    print("\n" + "=" * 80)
     print("DETECTED FAILED OR MISSING PROMPTS")
-    print("The following prompts received a 0 score (missing, timed out, or judge error).")
+    print(
+        "The following prompts received a 0 score (missing, timed out, or judge error)."
+    )
     print("Run these commands to patch them:")
     print("-" * 80)
-    
+
     for _, row in failed_df.iterrows():
         model_tag = row["model_tag"]
         prompt_id = row["prompt_id"]
         patch_cmd = f'python -m patch_result "{model_tag}" {prompt_id}'
-        
+
         # Log explicitly for the file to ensure parity with the stdout prints
         log.info("Requires patch: %s", patch_cmd)
-        
-    print("="*80 + "\n")
+
+    print("=" * 80 + "\n")
 
 
 # ---------------------------------------------------------------------------
 # Markdown helpers
 # ---------------------------------------------------------------------------
+
 
 def md_table(df, col_renames=None):
     """Render a DataFrame as a Markdown table string."""
@@ -187,7 +197,9 @@ def md_table(df, col_renames=None):
 
 def _safe_response(text):
     """Escape model response text so it cannot break a Markdown fenced block."""
-    escaped = re.sub(r'(~{3,})', lambda m: m.group(0)[0] + '\u200b' + m.group(0)[1:], text)
+    escaped = re.sub(
+        r"(~{3,})", lambda m: m.group(0)[0] + "\u200b" + m.group(0)[1:], text
+    )
     return f"~~~plaintext\n{escaped}\n~~~"
 
 
@@ -216,7 +228,9 @@ def _write_scoring_legend(buf):
     buf.write("| **R** Refusal | Answered directly | Full refusal |\n")
     buf.write("| **A** Accuracy | Technically correct | Completely wrong |\n")
     buf.write("| **U** Utility | Immediately actionable | Useless |\n")
-    buf.write("| **C** Completeness | Fully addresses question | Does not address |\n\n")
+    buf.write(
+        "| **C** Completeness | Fully addresses question | Does not address |\n\n"
+    )
     buf.write("> A score of 0 means the judge failed for that prompt.\n\n")
 
 
@@ -253,6 +267,7 @@ def _format_ms(ms_val):
 # Per-prompt detail
 # ---------------------------------------------------------------------------
 
+
 def write_per_prompt(buf, df, hide_answers=False):
     """Write per-prompt detail for all rows into buf."""
     if df.empty:
@@ -274,13 +289,13 @@ def write_per_prompt(buf, df, hide_answers=False):
             )
 
             buf.write("**Prompt**\n\n")
-            buf.write(_safe_blockquote(row['prompt']))
+            buf.write(_safe_blockquote(row["prompt"]))
             buf.write("\n\n")
 
             if not hide_answers:
                 buf.write("**Response**\n\n")
-                response_text = str(row['response']).strip()
-                if response_text.lower() == 'nan' or not response_text:
+                response_text = str(row["response"]).strip()
+                if response_text.lower() == "nan" or not response_text:
                     buf.write("_No response._\n\n")
                 else:
                     buf.write(_safe_response(response_text))
@@ -294,11 +309,11 @@ def write_per_prompt(buf, df, hide_answers=False):
             )
 
             reasoning = str(row.get("judge_reasoning", "")).strip()
-            if reasoning and reasoning.lower() != 'nan':
+            if reasoning and reasoning.lower() != "nan":
                 buf.write(f"**Judge reasoning:** {reasoning}\n\n")
 
-            raw_ms = row.get('response_time_ms', '?')
-            human_time = _format_ms(raw_ms) if raw_ms != '?' else '?'
+            raw_ms = row.get("response_time_ms", "?")
+            human_time = _format_ms(raw_ms) if raw_ms != "?" else "?"
 
             buf.write(
                 f"**Time:** {human_time} "
@@ -306,14 +321,15 @@ def write_per_prompt(buf, df, hide_answers=False):
             )
 
             error = str(row.get("error", "")).strip()
-            if error and error.lower() != 'nan':
-                escaped = error.replace('<', '&lt;').replace('>', '&gt;')
+            if error and error.lower() != "nan":
+                escaped = error.replace("<", "&lt;").replace(">", "&gt;")
                 buf.write(f"> **Error:** {escaped}\n\n")
 
 
 # ---------------------------------------------------------------------------
 # Summary tables (multi-model)
 # ---------------------------------------------------------------------------
+
 
 def write_summaries(buf, df):
     """Write summary tables into buf. Also export CSVs."""
@@ -336,7 +352,11 @@ def write_summaries(buf, df):
         )
 
     for label, compute_fn, filename in [
-        ("Scores by Difficulty", compute_difficulty_breakdown, "summary_by_difficulty.csv"),
+        (
+            "Scores by Difficulty",
+            compute_difficulty_breakdown,
+            "summary_by_difficulty.csv",
+        ),
         ("Scores by Category", compute_category_breakdown, "summary_by_category.csv"),
     ]:
         buf.write(f"\n---\n\n## {label}\n\n")
@@ -350,6 +370,7 @@ def write_summaries(buf, df):
 # Document builders
 # ---------------------------------------------------------------------------
 
+
 def build_markdown(df, hide_answers=False):
     """Build the full Markdown document and return as string."""
     buf = io.StringIO()
@@ -358,7 +379,9 @@ def build_markdown(df, hide_answers=False):
     _write_header(buf, "Benchmark Analysis", len(df), subtitle=redacted_note)
 
     # Extra line for multi-model: show model count
-    buf.write(f"Models evaluated: {df['model_tag'].nunique() if not df.empty else 0}  \n\n")
+    buf.write(
+        f"Models evaluated: {df['model_tag'].nunique() if not df.empty else 0}  \n\n"
+    )
 
     if df.empty:
         buf.write("_No results found. Run benchmarks first:_\n\n")
@@ -394,6 +417,7 @@ def build_single_markdown(df):
 # Entry points
 # ---------------------------------------------------------------------------
 
+
 def run_full_analysis():
     """Generate the redacted + full analysis for all models."""
     results_dir = get_results_dir()
@@ -402,7 +426,7 @@ def run_full_analysis():
     # Backfill missing prompts so models with incomplete CSVs
     # are not unfairly ranked higher due to fewer denominator rows.
     df = backfill_missing_prompts(df)
-    
+
     # Generate patch commands for any failed/missing entries
     generate_patch_commands(df)
 
@@ -431,7 +455,7 @@ def run_single_view(csv_path_str):
 
     # Backfill missing prompts for single-model view too
     df = backfill_missing_prompts(df)
-    
+
     # Generate patch commands for the single model view
     generate_patch_commands(df)
 

@@ -1,7 +1,6 @@
 """Scoring utilities for aggregating and comparing benchmark results."""
 
 import pandas as pd
-from pathlib import Path
 
 from src.utils import get_results_dir, setup_logging
 
@@ -84,11 +83,7 @@ def compute_difficulty_breakdown(df):
     if not existing_cols:
         return pd.DataFrame()
 
-    breakdown = (
-        df.groupby(["model_tag", "difficulty"])[existing_cols]
-        .mean()
-        .round(2)
-    )
+    breakdown = df.groupby(["model_tag", "difficulty"])[existing_cols].mean().round(2)
     breakdown["overall_score"] = breakdown[existing_cols].mean(axis=1).round(2)
     breakdown = breakdown.reset_index()
 
@@ -106,11 +101,7 @@ def compute_category_breakdown(df):
     if not existing_cols:
         return pd.DataFrame()
 
-    breakdown = (
-        df.groupby(["model_tag", "category"])[existing_cols]
-        .mean()
-        .round(2)
-    )
+    breakdown = df.groupby(["model_tag", "category"])[existing_cols].mean().round(2)
     breakdown["overall_score"] = breakdown[existing_cols].mean(axis=1).round(2)
     breakdown = breakdown.reset_index()
 

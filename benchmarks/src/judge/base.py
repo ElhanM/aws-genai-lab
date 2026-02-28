@@ -141,7 +141,9 @@ MODEL RESPONSE TO EVALUATE:
                 validated = self._validate_and_clamp(scores)
 
                 if validated is None:
-                    self._log_attempt(attempt, raw, error="validation failed (missing keys)")
+                    self._log_attempt(
+                        attempt, raw, error="validation failed (missing keys)"
+                    )
                     time.sleep(2)
                     continue
 
@@ -155,5 +157,7 @@ MODEL RESPONSE TO EVALUATE:
                 self._log_attempt(attempt, raw, error=exc)
                 time.sleep(5)
 
-        log.error("Judge failed after %d retries, returning default scores", self.max_retries)
+        log.error(
+            "Judge failed after %d retries, returning default scores", self.max_retries
+        )
         return dict(DEFAULT_SCORES)

@@ -11,7 +11,6 @@ Supports both Ollama Library tags and HuggingFace GGUF tags:
 
 import json
 import os
-import subprocess
 import time
 import requests
 
@@ -158,15 +157,24 @@ class OllamaClient:
                 if r.status_code == 200:
                     log.info("  Deleted: %s", name)
                 else:
-                    log.warning("  Failed to delete %s (status %d)", name, r.status_code)
+                    log.warning(
+                        "  Failed to delete %s (status %d)", name, r.status_code
+                    )
             except requests.RequestException as exc:
                 log.warning("  Failed to delete %s: %s", name, exc)
 
     # ------------------------------------------------------------------
     # Inference
     # ------------------------------------------------------------------
-    def generate(self, model_tag, prompt, temperature=0.7, max_tokens=4096,
-                 timeout=150, silent=False):
+    def generate(
+        self,
+        model_tag,
+        prompt,
+        temperature=0.7,
+        max_tokens=4096,
+        timeout=150,
+        silent=False,
+    ):
         """Send a prompt to a model and stream the response text.
 
         The model_tag is normalized before use. Works with both Ollama
@@ -226,7 +234,10 @@ class OllamaClient:
 
             return {
                 "response": "".join(full_response),
-                "total_duration_ms": final_metrics.get("total_duration", elapsed_ms * 1_000_000) // 1_000_000,
+                "total_duration_ms": final_metrics.get(
+                    "total_duration", elapsed_ms * 1_000_000
+                )
+                // 1_000_000,
                 "eval_count": final_metrics.get("eval_count", 0),
                 "prompt_eval_count": final_metrics.get("prompt_eval_count", 0),
                 "error": None,

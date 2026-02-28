@@ -105,12 +105,17 @@ def patch_result(model_tag, target_prompt_id):
         time.sleep(2)
     else:
         scores = {
-            "refusal": 0, "accuracy": 0, "utility": 0, "completeness": 0,
+            "refusal": 0,
+            "accuracy": 0,
+            "utility": 0,
+            "completeness": 0,
             "reasoning": f"No response generated. Error: {gen_error}",
         }
 
-    print(f"Scores: R={scores['refusal']} A={scores['accuracy']} "
-          f"U={scores['utility']} C={scores['completeness']}")
+    print(
+        f"Scores: R={scores['refusal']} A={scores['accuracy']} "
+        f"U={scores['utility']} C={scores['completeness']}"
+    )
 
     # --- Update in-place OR Append ---
     update_data = {
@@ -152,7 +157,9 @@ def patch_result(model_tag, target_prompt_id):
 def main():
     if len(sys.argv) != 3:
         print("Usage: python -m patch_result <model_tag> <prompt_id>")
-        print('Example: python -m patch_result "WhiteRabbitNeo/Llama-3.1-WhiteRabbitNeo-2-70B" exploit-01')
+        print(
+            'Example: python -m patch_result "WhiteRabbitNeo/Llama-3.1-WhiteRabbitNeo-2-70B" exploit-01'
+        )
         sys.exit(1)
 
     patch_result(sys.argv[1], sys.argv[2])

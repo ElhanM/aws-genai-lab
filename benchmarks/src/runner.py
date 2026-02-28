@@ -51,7 +51,9 @@ def run_benchmark():
     judge = create_judge()
     results_dir = get_results_dir()
 
-    log.info("Starting benchmark run: %d models x %d prompts", len(models), len(prompts))
+    log.info(
+        "Starting benchmark run: %d models x %d prompts", len(models), len(prompts)
+    )
 
     # Clean slate: remove all models from Ollama before starting
     if default_client.is_available():
@@ -73,7 +75,8 @@ def run_benchmark():
             log.error(
                 "Ollama is not reachable at %s for model %s. "
                 "Make sure the AI lab is running and the SSH tunnel is active.",
-                client.base_url, tag,
+                client.base_url,
+                tag,
             )
             continue
 
@@ -132,7 +135,10 @@ def run_benchmark():
 
                 log.info(
                     "  [%d/%d] Prompt %s (difficulty %d)",
-                    i, len(prompts), prompt_id, difficulty,
+                    i,
+                    len(prompts),
+                    prompt_id,
+                    difficulty,
                 )
 
                 result = client.generate(tag, prompt_text)
@@ -160,8 +166,10 @@ def run_benchmark():
 
                 log.info(
                     "    Scores: R=%s A=%s U=%s C=%s",
-                    scores["refusal"], scores["accuracy"],
-                    scores["utility"], scores["completeness"],
+                    scores["refusal"],
+                    scores["accuracy"],
+                    scores["utility"],
+                    scores["completeness"],
                 )
 
                 row = {
