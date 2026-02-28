@@ -44,3 +44,5 @@ benchmarks/.env
 
 # Except for the research analysis file (redacted answers only)
 !benchmarks/results/analysis_output.md
+
+.ruff_cache
