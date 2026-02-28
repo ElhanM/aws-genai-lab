@@ -96,7 +96,7 @@ def run_benchmark():
 
         # Warmup: send a short prompt to force model loading into VRAM
         log.info("Warming up model...")
-        client.generate(tag, "Hello", max_tokens=1)
+        client.generate(tag, "Hello", max_tokens=1, silent=True)
         log.info("Model warm-up complete.")
 
         # Prepare CSV

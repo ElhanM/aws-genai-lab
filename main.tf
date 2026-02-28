@@ -169,6 +169,7 @@ resource "aws_instance" "lab_instance" {
                 mkdir -p "$NVME_PATH/ollama"
                 chown ollama:ollama "$NVME_PATH/ollama"
                 mkdir -p /usr/share/ollama/.ollama
+                chown ollama:ollama /usr/share/ollama/.ollama
                 ln -sfn "$NVME_PATH/ollama" /usr/share/ollama/.ollama/models
                 chown -h ollama:ollama /usr/share/ollama/.ollama/models
               fi

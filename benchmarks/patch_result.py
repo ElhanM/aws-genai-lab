@@ -38,6 +38,7 @@ def patch_result(model_tag, target_prompt_id):
     # Load prompts config
     prompts_cfg = load_yaml("prompts.yaml")
     prompts = {p["id"]: p for p in prompts_cfg.get("prompts", [])}
+    prompt_order = [p["id"] for p in prompts_cfg.get("prompts", [])]
 
     if target_prompt_id not in prompts:
         print(f"Error: prompt '{target_prompt_id}' not found in config/prompts.yaml")
@@ -76,7 +77,7 @@ def patch_result(model_tag, target_prompt_id):
         print("Error: Failed to pull model.")
         sys.exit(1)
     print("Warming up model...")
-    client.generate(tag, "Hello", max_tokens=1)
+    client.generate(tag, "Hello", max_tokens=1, silent=True)
     print("Warm-up complete.")
 
     # Run the prompt
@@ -134,6 +135,10 @@ def patch_result(model_tag, target_prompt_id):
         new_row = {field: "" for field in fieldnames}
         new_row.update(update_data)
         rows.append(new_row)
+
+    # Sort rows to match prompts.yaml order
+    order_map = {pid: i for i, pid in enumerate(prompt_order)}
+    rows.sort(key=lambda r: order_map.get(r.get("prompt_id", ""), len(order_map)))
 
     # Write back to CSV
     with open(csv_path, "w", newline="", encoding="utf-8") as f:

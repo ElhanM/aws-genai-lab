@@ -165,12 +165,12 @@ class OllamaClient:
     # ------------------------------------------------------------------
     # Inference
     # ------------------------------------------------------------------
-    def generate(self, model_tag, prompt, temperature=0.7, max_tokens=4096,
-                 timeout=600):
-        """Send a prompt to a model and return the response text.
+    def generate(self, model_tag, prompt, temperature=0.7, max_tokens=2048,
+                 timeout=300, silent=False):
+        """Send a prompt to a model and stream the response text.
 
         The model_tag is normalized before use. Works with both Ollama
-        Library tags and HuggingFace GGUF tags.
+        Library tags and HuggingFace GGUF tags. Streams output to console unless silent=True.
 
         Returns a dict with keys: response, total_duration_ms, eval_count,
         prompt_eval_count, error.
@@ -179,7 +179,7 @@ class OllamaClient:
         payload = {
             "model": model_tag,
             "prompt": prompt,
-            "stream": False,
+            "stream": True,
             "options": {
                 "temperature": temperature,
                 "num_predict": max_tokens,
@@ -192,18 +192,46 @@ class OllamaClient:
                 f"{self.base_url}/api/generate",
                 json=payload,
                 timeout=timeout,
+                stream=True,
             )
             r.raise_for_status()
-            data = r.json()
+
+            full_response = []
+            final_metrics = {}
+
+            if not silent:
+                print(f"\n--- [START] Streaming from {model_tag} ---")
+
+            for line in r.iter_lines():
+                if line:
+                    try:
+                        data = json.loads(line)
+                        chunk = data.get("response", "")
+
+                        full_response.append(chunk)
+
+                        if not silent:
+                            print(chunk, end="", flush=True)
+
+                        if data.get("done"):
+                            final_metrics = data
+
+                    except json.JSONDecodeError:
+                        log.warning("Failed to decode stream chunk: %s", line)
+
+            if not silent:
+                print("\n--- [END] Generation complete ---")
+
             elapsed_ms = int((time.time() - start) * 1000)
 
             return {
-                "response": data.get("response", ""),
-                "total_duration_ms": data.get("total_duration", elapsed_ms * 1_000_000) // 1_000_000,
-                "eval_count": data.get("eval_count", 0),
-                "prompt_eval_count": data.get("prompt_eval_count", 0),
+                "response": "".join(full_response),
+                "total_duration_ms": final_metrics.get("total_duration", elapsed_ms * 1_000_000) // 1_000_000,
+                "eval_count": final_metrics.get("eval_count", 0),
+                "prompt_eval_count": final_metrics.get("prompt_eval_count", 0),
                 "error": None,
             }
+
         except requests.RequestException as exc:
             elapsed_ms = int((time.time() - start) * 1000)
             log.error("Generation failed for %s: %s", model_tag, exc)
