@@ -100,7 +100,7 @@ The model tag is the same format used in `config/models.yaml`. The script will:
 **Example:**
 
 ```bash
-python -m patch_result "WhiteRabbitNeo/Llama-3.1-WhiteRabbitNeo-2-70B" exploit-01
+python -m patch_result "hf.co/AlicanKiraz0/Seneca-Cybersecurity-LLM-x-QwQ-32B-Q8_Max-Version:Q8_0" exploit-01
 ```
 
 After patching, re-run the analysis to update the summary tables:

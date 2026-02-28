@@ -165,8 +165,8 @@ class OllamaClient:
     # ------------------------------------------------------------------
     # Inference
     # ------------------------------------------------------------------
-    def generate(self, model_tag, prompt, temperature=0.7, max_tokens=2048,
-                 timeout=300, silent=False):
+    def generate(self, model_tag, prompt, temperature=0.7, max_tokens=4096,
+                 timeout=150, silent=False):
         """Send a prompt to a model and stream the response text.
 
         The model_tag is normalized before use. Works with both Ollama

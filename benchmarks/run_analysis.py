@@ -159,8 +159,6 @@ def generate_patch_commands(df):
         # Log explicitly for the file to ensure parity with the stdout prints
         log.info("Requires patch: %s", patch_cmd)
         
-        print(patch_cmd)
-        
     print("="*80 + "\n")
 
 
